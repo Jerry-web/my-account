@@ -2,5 +2,9 @@
 一、前端 my-account-web 
  1. vue2.0 + webpack + vue-cli + vue-router + vuex
  
+二、设计需求
+
+
+ 
 
  
