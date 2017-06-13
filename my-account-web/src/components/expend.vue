@@ -19,41 +19,41 @@
 
       <el-select v-model="value8" filterable placeholder="选择类型查询">
         <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
+          v-for="type in typeList"
+          :key="type.type_id"
+          :label="type.type_name"
+          :value="type.type_id">
         </el-option>
       </el-select>
-      <el-select v-model="value9" filterable placeholder="选择成员查询">
+      <el-select v-model="value9" filterable placeholder="选择支出成员查询">
         <el-option
-          v-for="item in members"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
+          v-for="member in memberList"
+          :key="member.member_id"
+          :label="member.member_name"
+          :value="member.member_id">
         </el-option>
       </el-select>
-      <el-button type="success" class="floatright fs15"  icon="plus" @click="editFormVisible=true">新增支出</el-button>
+      <el-button type="success" class="floatright fs15"  icon="plus" @click="expendFormOpen">新增支出</el-button>
     </div>
     <el-table
-      :data="tableData"
+      :data="expendList"
       border
       style="width: 100%">
       <el-table-column
-        prop="date"
+        prop="account_date"
         label="日期">
       </el-table-column>
       <el-table-column
-        prop="type"
+        prop="type_name"
         label="类型">
       </el-table-column>
       <el-table-column
-        prop="money"
-        label="金额">
+        prop="account_sum"
+        label="金额（元）">
       </el-table-column>
       <el-table-column
-        prop="member"
-        label="成员">
+        prop="member_name"
+        label="支出成员">
       </el-table-column>
     </el-table>
     <div class="widget margin-top-20">
@@ -63,40 +63,40 @@
     </div>
 
 
-    <el-dialog class="add-expend" title="新增支出" v-model="editFormVisible" :close-on-click-modal="false" >
-      <el-form :model="editForm" label-width="80px"  ref="editForm" >
+    <el-dialog class="add-expend" title="新增支出" v-model="expendFormVisible" :close-on-click-modal="false" >
+      <el-form :model="expendForm" label-width="80px"  ref="editForm" >
         <el-form-item label="支出时间" prop="name" >
-          <el-date-picker type="date" placeholder="选择日期"  v-model="editForm.birth"></el-date-picker>
+          <el-date-picker type="date" placeholder="选择日期"  v-model="expendForm.account_date"></el-date-picker>
 
         </el-form-item>
         <el-form-item label="支出类型">
-          <el-select v-model="value8" filterable placeholder="选择类型查询">
+          <el-select v-model="expendForm.type_id" filterable placeholder="选择类型查询">
             <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              v-for="type in typeList"
+              :key="type.type_id"
+              :label="type.type_name"
+              :value="type.type_id">
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="支出金额">
-          <el-input type='number' style="width: 220px" placeholder="请输入内容" v-model="editForm.age">
+          <el-input type='number' style="width: 220px" placeholder="请填写支出金额" v-model="expendForm.account_sum">
           </el-input>
         </el-form-item>
         <el-form-item label="支出成员">
-          <el-select v-model="value9" filterable placeholder="选择成员查询">
+          <el-select v-model="expendForm.member_id" filterable placeholder="选择成员查询">
             <el-option
-              v-for="item in members"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              v-for="member in memberList"
+              :key="member.member_id"
+              :label="member.member_name"
+              :value="member.member_id">
             </el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="editFormVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="editSubmit" >提交</el-button>
+        <el-button @click.native="expendFormVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="expendSubmit" >提交</el-button>
       </div>
     </el-dialog>
 
@@ -108,73 +108,104 @@
   export default {
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          type: '生活用品',
-          money: 205,
-          member:'本人'
-        }, {
-          date: '2016-05-02',
-          type: '买菜',
-          money: 75,
-          member:'老婆'
-        }, {
-          date: '2016-05-02',
-          type: '话费',
-          money: 100,
-          member:'本人'
-        }, {
-          date: '2016-05-02',
-          type: '化妆品',
-          money: 300,
-          member:'老婆'
-        }],
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
-        members: [{
-          value: '选项1',
-          label: '本人'
-        }, {
-          value: '选项2',
-          label: '老婆'
-        }, {
-          value: '选项3',
-          label: '同事'
-        }, {
-          value: '选项4',
-          label: '朋友'
-        }],
         value8: '',
         value6: '',
         value9: '',
         labelPosition:'left',
-        //编辑界面数据
-        editForm: {
-          id: 0,
-          name: '',
-          sex: -1,
-          age: 0,
-          birth: '',
-          addr: ''
-        },
-        editFormVisible:false,
-        addFormVisible: false,//新增界面是否显示
+        expendFormVisible:false,
         addLoading: false,
+        memberList:[],
+        typeList:[],
+        expendList:[],
+        expendForm:{
+            account_date:null,
+            type_id:null,
+            account_sum:null,
+           member_id:null,
+
+        }
       };
+    },
+    methods:{
+      getMemberList:function () {
+          this.$http.get(
+              this.config.baseUrl+'member/queryAll'
+          ).then(response => {
+            var result=response.data;
+            if(result.code==0){
+                this.memberList=result.memberList
+            }
+          }, response => {
+            this.memberList=[]
+          })
+        },
+      getTypeList:function () {
+        this.$http.get(
+          this.config.baseUrl+'type/queryByFlow',{
+              params:{
+                type_flow:'0'
+              }
+          }
+
+        ).then(response => {
+          var result=response.data;
+          if(result.code==0){
+            this.typeList=result.typeList
+          }
+        }, response => {
+          this.typeList=[]
+        })
+      },
+      getExpendList:function () {
+          var e=this;
+        this.$http.get(
+          this.config.baseUrl+'account/queryAll'
+        ).then(response => {
+          var result=response.data;
+          if(result.code==0){
+              if(result.accountList&&result.accountList.length>0){
+                  result.accountList.forEach(function (expend) {
+                    expend.account_date=e.$moment(expend.account_date).format('YYYY-MM-DD')
+                  })
+              }
+            this.expendList=result.accountList
+
+          }
+        }, response => {
+          this.expendList=[]
+        })
+      },
+      expendFormOpen:function () {
+        this.expendFormVisible = true;
+        this.expendForm= {
+          account_date: null,
+          type_id: null,
+          account_sum: null,
+          member_id: null
+        }
+      },
+      expendSubmit:function () {
+        var e=this;
+        var expendInfo=this.expendForm;
+        expendInfo.account_flow=0;
+        expendInfo.user_id=1;
+        expendInfo.account_date=e.$moment(expendInfo.account_date).format('YYYY-MM-DD')
+        e.$http({
+          method:'GET',
+          url:this.config.baseUrl+'account/addAccount',
+          params:expendInfo
+        }).then(function(data){
+          var result=data.data;
+          var response=result.code;
+          if(response==0){
+            e.expendFormVisible=false;
+            e.getExpendList()
+          }
+        })
+
+
+      }
+
     },
     mounted(){
       let myChart = this.$echarts.init(document.getElementById('myChart'))
@@ -246,6 +277,11 @@
         ]
       };
       myChart.setOption(options)
+      this.getMemberList();
+      this.getTypeList();
+      this.getExpendList();
+
+
     }
   }
 </script>
