@@ -31,7 +31,7 @@ module.exports = {
 			connection.query($sql.insert, [param.name, param.age], function(err, result) {
 				if(result) {
 					result = {
-						code: 0,
+						code: 200,
 						msg:'增加成功'
 					};    
 				}
@@ -51,7 +51,7 @@ module.exports = {
 			connection.query($sql.delete, id, function(err, result) {
 				if(result.affectedRows > 0) {
 					result = {
-						code: 0,
+						code: 200,
 						msg:'删除成功'
 					};
 				} else {
@@ -90,9 +90,9 @@ module.exports = {
 
 	},
 	queryById: function (req, res, next) {
-		var user_id = +req.query.id; // 为了拼凑正确的sql语句，这里要转下整数
+		var id = +req.query.id; // 为了拼凑正确的sql语句，这里要转下整数
 		pool.getConnection(function(err, connection) {
-			connection.query($sql.queryById, user_id, function(err, result) {
+			connection.query($sql.queryById, id, function(err, result) {
 				jsonWrite(res, result);
 				connection.release();
 
