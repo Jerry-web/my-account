@@ -4,11 +4,21 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'Hello',
-      component:  resolve => require(['components/index/index'], resolve)
+  routes:[
+    { path: '/', redirect: '/index/home' },
+    { path: '/index', component: resolve => require(['./components/index.vue'], resolve),
+      children:[
+        { path: 'home', component: resolve => require(['./components/home.vue'], resolve) },
+        { path: 'income', component: resolve => require(['./components/income.vue'], resolve) },
+        { path: 'expend', component: resolve => require(['./components/expend.vue'], resolve) },
+        { path: 'report', component: resolve => require(['./components/report.vue'], resolve) }
+
+      ]
     }
   ]
+
+
+
+
+
 })

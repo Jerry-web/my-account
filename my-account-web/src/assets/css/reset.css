@@ -45,6 +45,9 @@
 .fs24{
   font-size: 24px;
 }
+.fs35{
+  font-size: 35px;
+}
 /* ====== Container options ====== */
 .no-padding {
   padding: 0 !important
@@ -2433,7 +2436,12 @@ label {
 .flag-border-top{
   border-top:1px solid #e9e5df;
 }
-
+.floatright{
+  float: right;
+}
+.floatleft{
+  float: left;
+}
 .mint-loadmore-bottom span{
   display: inline-block;
   transition: .2s linear;
