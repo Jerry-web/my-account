@@ -1,19 +1,19 @@
 // dao/userDao.js
-// å®ç°ä¸MySQLäº¤äº’
+// ÊµÏÖÓëMySQL½»»¥
 var mysql = require('mysql');
 var $conf = require('../conf/db');
 var $util = require('../util/util');
-var $sql = require('./userSqlMapping');
+var $sql = require('./accountSqlMapping');
 
-// ä½¿ç”¨è¿æ¥æ± ï¼Œæå‡æ€§èƒ½
+// Ê¹ÓÃÁ¬½Ó³Ø£¬ÌáÉıĞÔÄÜ
 var pool  = mysql.createPool($util.extend({}, $conf.mysql));
 
-// å‘å‰å°è¿”å›JSONæ–¹æ³•çš„ç®€å•å°è£…
+// ÏòÇ°Ì¨·µ»ØJSON·½·¨µÄ¼òµ¥·â×°
 var jsonWrite = function (res, ret) {
 	if(typeof ret === 'undefined') {
 		res.json({
 			code:'1',
-			msg: 'æ“ä½œå¤±è´¥'
+			msg: '²Ù×÷Ê§°Ü'
 		});
 	} else {
 		res.json(ret);
@@ -23,23 +23,22 @@ var jsonWrite = function (res, ret) {
 module.exports = {
 	add: function (req, res, next) {
 		pool.getConnection(function(err, connection) {
-			// è·å–å‰å°é¡µé¢ä¼ è¿‡æ¥çš„å‚æ•°
+			// »ñÈ¡Ç°Ì¨Ò³Ãæ´«¹ıÀ´µÄ²ÎÊı
 			var param = req.query || req.params;
 
-			// å»ºç«‹è¿æ¥ï¼Œå‘è¡¨ä¸­æ’å…¥å€¼
-			// 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
-			connection.query($sql.insert, [param.name, param.age], function(err, result) {
+			// ½¨Á¢Á¬½Ó£¬Ïò±íÖĞ²åÈëÖµ
+
+			connection.query($sql.insert, [param.account_date, param.account_sum,param.type_id,param.user_id,param.account_remark,param.account_flow,param.member_id], function(err, result) {
 				if(result) {
 					result = {
 						code: 0,
-						msg:'å¢åŠ æˆåŠŸ'
+						msg:'Ôö¼Ó³É¹¦'
 					};    
 				}
-
-				// ä»¥jsonå½¢å¼ï¼ŒæŠŠæ“ä½œç»“æœè¿”å›ç»™å‰å°é¡µé¢
+				// ÒÔjsonĞÎÊ½£¬°Ñ²Ù×÷½á¹û·µ»Ø¸øÇ°Ì¨Ò³Ãæ
 				jsonWrite(res, result);
 
-				// é‡Šæ”¾è¿æ¥ 
+				// ÊÍ·ÅÁ¬½Ó 
 				connection.release();
 			});
 		});
@@ -52,7 +51,7 @@ module.exports = {
 				if(result.affectedRows > 0) {
 					result = {
 						code: 0,
-						msg:'åˆ é™¤æˆåŠŸ'
+						msg:'É¾³ı³É¹¦'
 					};
 				} else {
 					result = void 0;
@@ -64,7 +63,7 @@ module.exports = {
 	},
 	update: function (req, res, next) {
 		// update by id
-		// ä¸ºäº†ç®€å•ï¼Œè¦æ±‚åŒæ—¶ä¼ nameå’Œageä¸¤ä¸ªå‚æ•°
+		// ÎªÁË¼òµ¥£¬ÒªÇóÍ¬Ê±´«nameºÍageÁ½¸ö²ÎÊı
 		var param = req.body;
 		if(param.name == null || param.age == null || param.id == null) {
 			jsonWrite(res, undefined);
@@ -73,11 +72,11 @@ module.exports = {
 
 		pool.getConnection(function(err, connection) {
 			connection.query($sql.update, [param.name, param.age, +param.id], function(err, result) {
-				// ä½¿ç”¨é¡µé¢è¿›è¡Œè·³è½¬æç¤º
+				// Ê¹ÓÃÒ³Ãæ½øĞĞÌø×ªÌáÊ¾
 				if(result.affectedRows > 0) {
 					res.render('suc', {
 						result: result
-					}); // ç¬¬äºŒä¸ªå‚æ•°å¯ä»¥ç›´æ¥åœ¨jadeä¸­ä½¿ç”¨
+					}); // µÚ¶ş¸ö²ÎÊı¿ÉÒÔÖ±½ÓÔÚjadeÖĞÊ¹ÓÃ
 				} else {
 					res.render('fail',  {
 						result: result
@@ -90,7 +89,7 @@ module.exports = {
 
 	},
 	queryById: function (req, res, next) {
-		var user_id = +req.query.id; // ä¸ºäº†æ‹¼å‡‘æ­£ç¡®çš„sqlè¯­å¥ï¼Œè¿™é‡Œè¦è½¬ä¸‹æ•´æ•°
+		var user_id = +req.query.id; // ÎªÁËÆ´´ÕÕıÈ·µÄsqlÓï¾ä£¬ÕâÀïÒª×ªÏÂÕûÊı
 		pool.getConnection(function(err, connection) {
 			connection.query($sql.queryById, user_id, function(err, result) {
 				jsonWrite(res, result);
@@ -102,7 +101,14 @@ module.exports = {
 	queryAll: function (req, res, next) {
 		pool.getConnection(function(err, connection) {
 			connection.query($sql.queryAll, function(err, result) {
-				jsonWrite(res, result);
+                var resultData=result;
+                if(result!==undefined){
+                     resultData={
+                        accountList:result,
+                        code:0
+                    };
+                }
+				jsonWrite(res, resultData);
 				connection.release();
 			});
 		});
