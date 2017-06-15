@@ -1,5 +1,5 @@
 // dao/userSqlMapping.js
-// CRUD SQL”Ôæ‰
+// CRUD SQLËØ≠Âè•
 var accountType = {
 	insert:'INSERT INTO account_type(type_name, type_parent) VALUES(0,?)',
 	update:'update account_type set type_name=?, type_parent=?',

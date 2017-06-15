@@ -1,19 +1,19 @@
 // dao/userDao.js
-// ÊµÏÖÓëMySQL½»»¥
+// å®ç°ä¸MySQLäº¤äº’
 var mysql = require('mysql');
 var $conf = require('../conf/db');
 var $util = require('../util/util');
 var $sql = require('./typeSqlMapping');
 
-// Ê¹ÓÃÁ¬½Ó³Ø£¬ÌáÉıĞÔÄÜ
+// ä½¿ç”¨è¿æ¥æ± ï¼Œæå‡æ€§èƒ½
 var pool  = mysql.createPool($util.extend({}, $conf.mysql));
 
-// ÏòÇ°Ì¨·µ»ØJSON·½·¨µÄ¼òµ¥·â×°
+// å‘å‰å°è¿”å›JSONæ–¹æ³•çš„ç®€å•å°è£…
 var jsonWrite = function (res, ret) {
 	if(typeof ret === 'undefined') {
 		res.json({
 			code:'1',
-			msg: '²Ù×÷Ê§°Ü'
+			msg: 'æ“ä½œå¤±è´¥'
 		});
 	} else {
 		res.json(ret);
@@ -23,23 +23,23 @@ var jsonWrite = function (res, ret) {
 module.exports = {
 	add: function (req, res, next) {
 		pool.getConnection(function(err, connection) {
-			// »ñÈ¡Ç°Ì¨Ò³Ãæ´«¹ıÀ´µÄ²ÎÊı
+			// è·å–å‰å°é¡µé¢ä¼ è¿‡æ¥çš„å‚æ•°
 			var param = req.query || req.params;
 
-			// ½¨Á¢Á¬½Ó£¬Ïò±íÖĞ²åÈëÖµ
+			// å»ºç«‹è¿æ¥ï¼Œå‘è¡¨ä¸­æ’å…¥å€¼
 			// 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
 			connection.query($sql.insert, [param.type_name, param.type_parent], function(err, result) {
 				if(result) {
 					result = {
 						code: 0,
-						msg:'Ôö¼Ó³É¹¦'
+						msg:'å¢åŠ æˆåŠŸ'
 					};    
 				}
 
-				// ÒÔjsonĞÎÊ½£¬°Ñ²Ù×÷½á¹û·µ»Ø¸øÇ°Ì¨Ò³Ãæ
+				// ä»¥jsonå½¢å¼ï¼ŒæŠŠæ“ä½œç»“æœè¿”å›ç»™å‰å°é¡µé¢
 				jsonWrite(res, result);
 
-				// ÊÍ·ÅÁ¬½Ó 
+				// é‡Šæ”¾è¿æ¥ 
 				connection.release();
 			});
 		});
@@ -52,7 +52,7 @@ module.exports = {
 				if(result.affectedRows > 0) {
 					result = {
 						code: 0,
-						msg:'É¾³ı³É¹¦'
+						msg:'åˆ é™¤æˆåŠŸ'
 					};
 				} else {
 					result = void 0;
@@ -64,7 +64,7 @@ module.exports = {
 	},
 	update: function (req, res, next) {
 		// update by id
-		// ÎªÁË¼òµ¥£¬ÒªÇóÍ¬Ê±´«nameºÍageÁ½¸ö²ÎÊı
+		// ä¸ºäº†ç®€å•ï¼Œè¦æ±‚åŒæ—¶ä¼ nameå’Œageä¸¤ä¸ªå‚æ•°
 		var param = req.body;
 		if(param.name == null || param.age == null || param.id == null) {
 			jsonWrite(res, undefined);
@@ -73,11 +73,11 @@ module.exports = {
 
 		pool.getConnection(function(err, connection) {
 			connection.query($sql.update, [param.name, param.age, +param.id], function(err, result) {
-				// Ê¹ÓÃÒ³Ãæ½øĞĞÌø×ªÌáÊ¾
+				// ä½¿ç”¨é¡µé¢è¿›è¡Œè·³è½¬æç¤º
 				if(result.affectedRows > 0) {
 					res.render('suc', {
 						result: result
-					}); // µÚ¶ş¸ö²ÎÊı¿ÉÒÔÖ±½ÓÔÚjadeÖĞÊ¹ÓÃ
+					}); // ç¬¬äºŒä¸ªå‚æ•°å¯ä»¥ç›´æ¥åœ¨jadeä¸­ä½¿ç”¨
 				} else {
 					res.render('fail',  {
 						result: result
@@ -90,7 +90,7 @@ module.exports = {
 
 	},
 	queryById: function (req, res, next) {
-		var user_id = +req.query.id; // ÎªÁËÆ´´ÕÕıÈ·µÄsqlÓï¾ä£¬ÕâÀïÒª×ªÏÂÕûÊı
+		var user_id = +req.query.id; // ä¸ºäº†æ‹¼å‡‘æ­£ç¡®çš„sqlè¯­å¥ï¼Œè¿™é‡Œè¦è½¬ä¸‹æ•´æ•°
 		pool.getConnection(function(err, connection) {
 			connection.query($sql.queryById, user_id, function(err, result) {
 				jsonWrite(res, result);

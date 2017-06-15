@@ -3,21 +3,32 @@
     <el-row class="margin-bottom-20">
       <el-col :span="12"><h1 class="no-margin-top fs35">支出信息</h1></el-col>
       <el-col :span="12" class="text-right">
-        <el-radio-group v-model="labelPosition" size="large">
-          <el-radio-button label="left">日</el-radio-button>
-          <el-radio-button label="right">月</el-radio-button>
-          <el-radio-button label="top">年</el-radio-button>
+        <el-radio-group v-model="expendModel" size="large" change="modelChange">
+          <el-radio-button label="day">日</el-radio-button>
+          <el-radio-button label="month">月</el-radio-button>
+          <el-radio-button label="year">年</el-radio-button>
         </el-radio-group>
       </el-col>
     </el-row>
-    <div class="margin-bottom-10" style="padding: 10px;background: #dedede;">
-      <el-date-picker
-        v-model="value6"
+    <div class="margin-bottom-10 block" style="padding: 10px;background: #dedede;">
+
+      <el-date-picker v-show="expendModel=='day'"
+        v-model="searchInfo.date_range"
         type="daterange"
         placeholder="选择日期范围查询">
       </el-date-picker>
+      <el-date-picker v-show="expendModel=='month'"
+        v-model="searchInfo.date_month"
+        type="month"
+        placeholder="选择月份">
+      </el-date-picker>
+      <el-date-picker v-show="expendModel=='year'"
+        v-model="searchInfo.date_year"
+        type="year"
+        placeholder="选择年份">
+      </el-date-picker>
 
-      <el-select v-model="value8" filterable placeholder="选择类型查询">
+      <el-select v-model="searchInfo.type_id" clearable filterable placeholder="选择类型查询">
         <el-option
           v-for="type in typeList"
           :key="type.type_id"
@@ -25,7 +36,7 @@
           :value="type.type_id">
         </el-option>
       </el-select>
-      <el-select v-model="value9" filterable placeholder="选择支出成员查询">
+      <el-select v-model="searchInfo.member_id" clearable filterable placeholder="选择支出成员查询">
         <el-option
           v-for="member in memberList"
           :key="member.member_id"
@@ -34,33 +45,66 @@
         </el-option>
       </el-select>
       <el-button type="success" class="floatright fs15"  icon="plus" @click="expendFormOpen">新增支出</el-button>
+
     </div>
-    <el-table
-      :data="expendList"
-      border
-      style="width: 100%">
-      <el-table-column
-        prop="account_date"
-        label="日期">
-      </el-table-column>
-      <el-table-column
-        prop="type_name"
-        label="类型">
-      </el-table-column>
-      <el-table-column
-        prop="account_sum"
-        label="金额（元）">
-      </el-table-column>
-      <el-table-column
-        prop="member_name"
-        label="支出成员">
-      </el-table-column>
-    </el-table>
-    <div class="widget margin-top-20">
-      <div class="widget-body" style="height: 360px">
-        <div id="myChart" style="width:900px;height:360px"></div>
+
+    <div >
+      <el-table
+        :data="expendList"
+        border
+        style="width: 100%">
+        <el-table-column
+          prop="account_date"
+          label="日期">
+        </el-table-column>
+        <el-table-column
+          prop="type_name"
+          label="类型">
+        </el-table-column>
+        <el-table-column
+          prop="account_sum"
+          label="金额（元）">
+        </el-table-column>
+        <el-table-column
+          prop="member_name"
+          label="支出成员">
+        </el-table-column>
+      </el-table>
+      <div class="text-right margin-top-5" v-show="currentPageParams.totalResult>0">
+        <label class="floatleft fs15 margin-top-5">共计支出：<span class="fs18" style="font-weight: bold">{{accountTotal}} 元</span></label>
+        <el-pagination class="no-padding-right"
+                       @current-change="handleCurrentChange"
+                       :current-page.sync="currentPageParams.currentPage"
+                       :page-size="currentPageParams.showCount"
+                       layout="total, prev, pager, next"
+                       :total="currentPageParams.totalResult">
+        </el-pagination>
+      </div>
+      <div class="widget margin-top-10" v-show="accountTypeList&&accountTypeList.length>0">
+        <div class="widget-body" style="height: 360px">
+          <div style="display: inline-block;width: 650px" ng-show="">
+            <div id="myChart" style="width:600px;height:360px"></div>
+          </div>
+          <div class=" margin-top-10" style="width:300px;display: inline-block;vertical-align: top">
+            <el-table
+              :data="accountTypeList"
+              border
+              style="width: 100%">
+              <el-table-column
+                prop="type_name"
+                label="类型">
+              </el-table-column>
+              <el-table-column
+                prop="type_sum"
+                label="支出金额（元）">
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
       </div>
     </div>
+
+
 
 
     <el-dialog class="add-expend" title="新增支出" v-model="expendFormVisible" :close-on-click-modal="false" >
@@ -108,21 +152,31 @@
   export default {
     data() {
       return {
-        value8: '',
-        value6: '',
-        value9: '',
-        labelPosition:'left',
+        searchInfo:{
+          date_range:[this.$moment(new Date()).subtract(7,'days'), new Date()],
+          date_month:new Date(),
+          date_year:new Date(),
+          type_id:null,
+          member_id:null
+        },
+        expendModel:'day',
         expendFormVisible:false,
         addLoading: false,
+        accountTotal:0,
         memberList:[],
         typeList:[],
         expendList:[],
+        accountTypeList:[],
         expendForm:{
             account_date:null,
             type_id:null,
             account_sum:null,
-           member_id:null,
-
+            member_id:null,
+        },
+        currentPageParams:{
+          currentPage:1,
+          showCount:10,
+          totalResult:0
         }
       };
     },
@@ -146,7 +200,6 @@
                 type_flow:'0'
               }
           }
-
         ).then(response => {
           var result=response.data;
           if(result.code==0){
@@ -157,28 +210,48 @@
         })
       },
       getExpendList:function () {
-          var e=this;
-        this.$http.get(
-          this.config.baseUrl+'account/queryAll'
-        ).then(response => {
+        var vm=this;
+        var dateRange=vm.searchInfo.date_range;
+        vm.searchInfo.search_range=null;
+        if(dateRange&&dateRange.length>0) {
+          if (dateRange[0] != null && dateRange[1] != null) {
+            vm.searchInfo.search_range = {
+              date_begin: vm.$moment(dateRange[0]).format('YYYY-MM-DD'),
+              date_end: vm.$moment(dateRange[1]).add('day', 1).format('YYYY-MM-DD')
+            }
+          }
+        }
+
+        vm.$http({
+          method: 'GET',
+          url: vm.config.baseUrl + 'account/queryAll',
+          params:{
+              accountStr:vm.searchInfo,
+              pageStr:vm.currentPageParams
+          }
+        }).then(response => {
           var result=response.data;
           if(result.code==0){
               if(result.accountList&&result.accountList.length>0){
                   result.accountList.forEach(function (expend) {
-                    expend.account_date=e.$moment(expend.account_date).format('YYYY-MM-DD')
+                    expend.account_date=vm.$moment(expend.account_date).format('YYYY-MM-DD')
                   })
               }
-            this.expendList=result.accountList
+            vm.expendList=result.accountList;
+            vm.currentPageParams=result.page;
+            vm.accountTotal=result.total;
+            vm.accountTypeList=result.accountTypeList;
+            vm.setCharts(result.accountTypeList)
 
           }
         }, response => {
-          this.expendList=[]
+          vm.expendList=[]
         })
       },
       expendFormOpen:function () {
         this.expendFormVisible = true;
         this.expendForm= {
-          account_date: null,
+          account_date: this.$moment().format('YYYY-MM-DD'),
           type_id: null,
           account_sum: null,
           member_id: null
@@ -202,81 +275,82 @@
             e.getExpendList()
           }
         })
+      },
+      setCharts:function (optionData) {
+        if(optionData&&optionData.length>0) {
+            var dataNames=[],optData=[];
+            optionData.forEach(function (expend) {
+                dataNames.push(expend.type_name);
+                var svalue= {
+                  value: expend.type_sum,
+                  name: expend.type_name
+                }
+                optData.push(svalue);
 
+            })
 
+          let myChart = this.$echarts.init(document.getElementById('myChart'))
+          var option = {
+            title: {
+              text: '支出类型统计',
+              x: 'center'
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'left',
+              data: dataNames
+            },
+            series: [
+              {
+                name: '类型支出',
+                type: 'pie',
+                radius: '60%',
+                center: ['50%', '50%'],
+                data: optData,
+                itemStyle: {
+                  emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                  }
+                }
+              }
+            ]
+          };
+          myChart.setOption(option)
+        }
+      },
+      handleCurrentChange(val) {
+        this.currentPageParams.currentPage=val;
+        this.getExpendList()
+      }
+
+    },
+    watch:{
+      searchInfo: {
+        handler: function (val, oldVal) {
+         this.getExpendList();
+        },
+        deep: true
+      },
+      expendModel:function (val) {
+
+        this.searchInfo= {
+          date_range: [this.$moment(new Date()).subtract(7,'days'), new Date()],
+          date_month: new Date(),
+          date_year: new Date(),
+          type_id: null,
+          member_id: null
+        }
       }
 
     },
     mounted(){
-      let myChart = this.$echarts.init(document.getElementById('myChart'))
-      var options = {
-        title : {
-          text: '某地区蒸发量和降水量',
-          subtext: '纯属虚构'
-        },
-        tooltip : {
-          trigger: 'axis'
-        },
-        legend: {
-          data:['蒸发量','降水量']
-        },
-        toolbox: {
-          show : true,
-          feature : {
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-          }
-        },
-        calculable : true,
-        xAxis : [
-          {
-            type : 'category',
-            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-          }
-        ],
-        yAxis : [
-          {
-            type : 'value'
-          }
-        ],
-        series : [
-          {
-            name:'蒸发量',
-            type:'bar',
-            data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3],
-            markPoint : {
-              data : [
-                {type : 'max', name: '最大值'},
-                {type : 'min', name: '最小值'}
-              ]
-            },
-            markLine : {
-              data : [
-                {type : 'average', name: '平均值'}
-              ]
-            }
-          },
-          {
-            name:'降水量',
-            type:'bar',
-            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
-            markPoint : {
-              data : [
-                {name : '年最高', value : 182.2, xAxis: 7, yAxis: 183},
-                {name : '年最低', value : 2.3, xAxis: 11, yAxis: 3}
-              ]
-            },
-            markLine : {
-              data : [
-                {type : 'average', name : '平均值'}
-              ]
-            }
-          }
-        ]
-      };
-      myChart.setOption(options)
+
       this.getMemberList();
       this.getTypeList();
       this.getExpendList();
