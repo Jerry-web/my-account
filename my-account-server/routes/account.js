@@ -22,12 +22,19 @@ router.get('/query', function(req, res, next) {
 	accountDao.queryById(req, res, next);
 });
 
+router.get('/queryByMonthOrYear', function(req, res, next) {
+    accountDao.queryByMonthOrYear(req, res, next);
+});
+
 router.get('/deleteAccount', function(req, res, next) {
 	accountDao.delete(req, res, next);
 });
 
 router.post('/updateAccount', function(req, res, next) {
 	accountDao.update(req, res, next);
+});
+router.get('/getAccountBalance', function(req, res, next) {
+    accountDao.getAccountBalance(req, res, next);
 });
 
 module.exports = router;

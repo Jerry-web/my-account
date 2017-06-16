@@ -2450,3 +2450,6 @@ label {
 .mint-loadmore-bottom rotate {
   transform: rotate(180deg);
 }
+.el-message{
+  top:50%
+}

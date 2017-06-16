@@ -122,19 +122,21 @@ module.exports = {
 			});
 		});
 	},
-	queryHome:function (req, res, next) {
+	queryByMonthOrYear:function (req, res, next) {
         var account=JSON.parse(req.query.accountStr);
-        var pageParams=JSON.parse(req.query.pageStr);
+        var pageParams='';
+        if(req.query.pageStr){
+            pageParams=JSON.parse(req.query.pageStr);
+		}
 
         pool.getConnection(function(err, connection) {
-            console.log($sql.queryAll(account,pageParams)+';'+$sql.queryCount(account)+';'+$sql.queryType(account));
-            connection.query($sql.queryAll(account,pageParams)+';'+$sql.queryCount(account)+';'+$sql.queryType(account), function(err, result) {
+            console.log($sql.queryMonthOrYear(account,pageParams)+';'+$sql.queryType(account));
+            connection.query($sql.queryMonthOrYear(account,pageParams)+';'+$sql.queryCount(account)+';'+$sql.queryType(account), function(err, result) {
                 var resultData=result;
                 if(result!==undefined){
-                    pageParams.totalResult=result[1][0].count;
                     resultData= {
                         accountList: result[0],
-                        total: result[1][0].total,
+                        total: result[1][0]!=null?result[1][0].total:0,
                         accountTypeList:result[2],
                         page: pageParams,
                         code: 0
@@ -145,5 +147,21 @@ module.exports = {
             });
         });
     },
+	getAccountBalance:function (req, res, next) {
+        pool.getConnection(function(err, connection) {
+            connection.query($sql.accountBalance+';'+$sql.accountBalance,[1,0], function(err, result) {
+                var resultData=result;
+                console.log(result);
+                if(result!==undefined){
+                    resultData= {
+                        accountBalance:result[0][0].sum-result[1][0].sum,
+                        code: 0
+                    };
+                }
+                jsonWrite(res, resultData);
+                connection.release();
+            });
+        });
+    }
 
 };

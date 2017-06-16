@@ -6,7 +6,7 @@ var accountType = {
 	delete: 'delete from account_type where type_id=?',
 	queryById: 'select * from account_type where type_id=?',
 	queryAll: 'select * from account_type',
-	queryByFlow: "select * from account_type where type_flow='0'"
+	queryByFlow: "select * from account_type where type_flow=?"
 
 };
 

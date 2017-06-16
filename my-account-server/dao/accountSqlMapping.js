@@ -7,87 +7,79 @@ var account = {
 	queryById: 'select * from account where account_id=?',
 	queryAll: function (account,pageParams) {
 		var sql='select a.account_id,a.account_date,a.account_sum,t.type_name,m.member_name  from (account as a  left join account_type as t on a.type_id=t.type_id ) left join account_member as m on a.member_id=m.member_id';
-        var conditionSql=""
+        sql+=' where account_flow='+ account.account_flow;
         if(account.type_id){
-            conditionSql+=' a.type_id='+account.type_id
+            sql+=' and a.type_id='+account.type_id
         }
         if(account.member_id){
-            if(conditionSql.length>0) {
-                conditionSql += ' and a.member_id=' + account.member_id
-            }else {
-                conditionSql += ' a.member_id=' + account.member_id
-			}
+            sql += ' and a.member_id=' + account.member_id
         }
         if(account.search_range){
             var date_range=account.search_range;
-            if(conditionSql.length>0) {
-                conditionSql += " and a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
-            }else {
-                conditionSql += " a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
-            }
+            sql += " and a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
         }
-		if(conditionSql.length>0){
-        	sql+=' where'+conditionSql
-		}
         if(pageParams&&JSON.stringify(pageParams).length>0){
             sql+=' limit '+pageParams.showCount+' offset '+pageParams.showCount*(pageParams.currentPage-1)
         }
-        console.log(sql)
 		return sql;
     },
     queryCount:function (account) {
-        var sql=' select count(*) as count,sum(account_sum) as total from account as a';
-        var conditionSql=""
+        var sql=' select count(*) as count,sum(account_sum) as total from account as a ';
+        sql+= ' where account_flow='+ account.account_flow
         if(account.type_id){
-            conditionSql+=' a.type_id='+account.type_id
+            sql+=' and a.type_id='+account.type_id
         }
         if(account.member_id){
-            if(conditionSql.length>0) {
-                conditionSql += ' and a.member_id=' + account.member_id
-            }else {
-                conditionSql += ' a.member_id=' + account.member_id
-            }
+            sql += ' and a.member_id=' + account.member_id
         }
         if(account.search_range){
             var date_range=account.search_range;
-            if(conditionSql.length>0) {
-                conditionSql += " and a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
-            }else {
-                conditionSql += " a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
-            }
-        }
-        if(conditionSql.length>0){
-            sql+=' where'+conditionSql
+            sql += " and a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
         }
         return sql;
     },
     queryType:function (account) {
         var sql='select SUM(a.account_sum) as type_sum,t.type_name  from account as a left join account_type as t on a.type_id=t.type_id';
-        var conditionSql=""
+        sql+= ' where account_flow='+ account.account_flow;
         if(account.type_id){
-            conditionSql+=' a.type_id='+account.type_id
+            sql+=' and a.type_id='+account.type_id
         }
         if(account.member_id){
-            if(conditionSql.length>0) {
-                conditionSql += ' and a.member_id=' + account.member_id
-            }else {
-                conditionSql += ' a.member_id=' + account.member_id
-            }
+            sql += ' and a.member_id=' + account.member_id
         }
         if(account.search_range){
             var date_range=account.search_range;
-            if(conditionSql.length>0) {
-                conditionSql += " and a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
-            }else {
-                conditionSql += " a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
-            }
+            sql += " and a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
         }
-        if(conditionSql.length>0){
-            sql+=' where'+conditionSql
-        }
-        return sql+' GROUP BY a.type_id';
+        sql+=' GROUP BY a.type_id'
+        return sql;
     },
-    queryMonth: "select date_format(account_date, '%Y-%m') as date_day, sum(account_sum)  as day_sum from account where account_date>? and account_date<? and group by date_format(account_date, '%Y-%m')"
+    queryMonthOrYear:function (account,pageParams) {
+	    var queryModel="'%Y-%m-%d'";
+	    if(account.dateType=='year'){
+            queryModel="'%Y-%m'";
+        }
+
+        var sql="select date_format(account_date, "+queryModel+") as account_date, sum(account_sum)  as account_sum from account as a ";
+        sql+= ' where account_flow='+ account.account_flow
+        if(account.type_id){
+            sql+=' and a.type_id='+account.type_id
+        }
+        if(account.member_id){
+            sql += ' and a.member_id=' + account.member_id
+        }
+        if(account.search_range){
+            var date_range=account.search_range;
+            sql += " and a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
+        }
+        sql+="group by date_format(account_date, "+queryModel+")";
+        if(pageParams&&JSON.stringify(pageParams).length>0){
+            sql+=' limit '+pageParams.showCount+' offset '+pageParams.showCount*(pageParams.currentPage-1)
+        }
+        console.log(sql)
+        return sql;
+    },
+    accountBalance:'select sum(account_sum) as sum from account where account_flow=?'
 
 };
 
