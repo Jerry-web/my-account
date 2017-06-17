@@ -10,7 +10,7 @@
   export default {
     data() {
       return {
-       value:'暂无报表'
+       value:'暂无账户信息'
       };
     }
   }

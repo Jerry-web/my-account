@@ -18,9 +18,11 @@ var account = {
             var date_range=account.search_range;
             sql += " and a.account_date>='" + date_range.date_begin+"' and a.account_date<'"+ date_range.date_end+"'"
         }
+        sql+=' ORDER BY a.account_date DESC';
         if(pageParams&&JSON.stringify(pageParams).length>0){
             sql+=' limit '+pageParams.showCount+' offset '+pageParams.showCount*(pageParams.currentPage-1)
         }
+
 		return sql;
     },
     queryCount:function (account) {

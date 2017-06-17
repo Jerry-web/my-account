@@ -47,8 +47,9 @@ module.exports = {
 	delete: function (req, res, next) {
 		// delete by Id
 		pool.getConnection(function(err, connection) {
-			var id = +req.query.id;
+			var id = +req.query.account_id;
 			connection.query($sql.delete, id, function(err, result) {
+				console.log(result)
 				if(result.affectedRows > 0) {
 					result = {
 						code: 0,
@@ -83,7 +84,6 @@ module.exports = {
 						result: result
 					});
 				}
-
 				connection.release();
 			});
 		});

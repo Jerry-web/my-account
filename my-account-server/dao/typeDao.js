@@ -28,7 +28,7 @@ module.exports = {
 
 			// 建立连接，向表中插入值
 			// 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
-			connection.query($sql.insert, [param.type_name, param.type_parent], function(err, result) {
+			connection.query($sql.insert, [param.type_name, param.type_flow], function(err, result) {
 				if(result) {
 					result = {
 						code: 0,

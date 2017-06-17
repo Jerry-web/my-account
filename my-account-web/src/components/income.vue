@@ -3,26 +3,26 @@
     <el-row class="margin-bottom-20">
       <el-col :span="12"><h1 class="no-margin-top fs35">收入信息<span class="fs16 margin-left-10 success">( 共计收入：{{accountTotal}} 元 )</span></h1></el-col>
       <el-col :span="12" class="text-right">
-        <el-radio-group v-model="expendModel" size="large" change="modelChange">
+        <el-radio-group v-model="incomedModel" size="large" change="modelChange">
           <el-radio-button label="day">日</el-radio-button>
           <el-radio-button label="month">月</el-radio-button>
           <el-radio-button label="year">年</el-radio-button>
         </el-radio-group>
       </el-col>
     </el-row>
-    <div class="margin-bottom-10 block" style="padding: 10px;background: #dedede;">
+    <div class=" block" style="padding: 10px;background: #dedede;">
 
-      <el-date-picker v-show="expendModel=='day'"
+      <el-date-picker v-show="incomedModel=='day'"
                       v-model="searchInfo.date_range"
                       type="daterange"
                       placeholder="选择日期范围查询">
       </el-date-picker>
-      <el-date-picker v-show="expendModel=='month'"
+      <el-date-picker v-show="incomedModel=='month'"
                       v-model="searchInfo.date_month"
                       type="month"
                       placeholder="选择月份">
       </el-date-picker>
-      <el-date-picker v-show="expendModel=='year'"
+      <el-date-picker v-show="incomedModel=='year'"
                       v-model="searchInfo.date_year"
                       type="year"
                       placeholder="选择年份">
@@ -44,11 +44,49 @@
           :value="member.member_id">
         </el-option>
       </el-select>
-      <el-button type="success" class="floatright fs15"  icon="plus" @click="expendFormOpen">新增收入</el-button>
+      <el-button type="success" v-show="!addIncomeFormVisible" class="floatright fs15"  icon="plus" @click="incomeFormOpen">新增收入</el-button>
+      <el-button type="warning" v-show="addIncomeFormVisible" class="floatright fs15"  icon="close" @click="addIncomeFormVisible=!addIncomeFormVisible">取消新增</el-button>
+    </div>
+    <div v-show="addIncomeFormVisible" style="border: 1px solid #d5d5d5;padding:20px 10px 0 10px">
+      <el-form :model="incomeForm" label-width="80px" :rules="incomeRules" :inline="true"  ref="incomeForm" >
+        <el-form-item label="收入日期" prop="account_date" class="margin-bottom-10">
+          <el-date-picker type="date" placeholder="选择日期"  v-model="incomeForm.account_date"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="收入类型" prop="type_id" class="margin-bottom-10">
+          <el-select v-model="incomeForm.type_id" filterable placeholder="选择类型查询">
+            <el-option
+              v-for="type in typeList"
+              :key="type.type_id"
+              :label="type.type_name"
+              :value="type.type_id">
+            </el-option>
+          </el-select>
+          <el-button @click="typeFormOpen" style="margin-left:-5px;border-bottom-left-radius: 0;border-top-left-radius: 0" class="padding-left-10 padding-right-10 "  icon="plus"></el-button>
+        </el-form-item>
+
+        <el-form-item label="收入成员" class="no-margin-bottom">
+          <el-select v-model="incomeForm.member_id"  filterable placeholder="选择成员查询">
+            <el-option
+              v-for="member in memberList"
+              :key="member.member_id"
+              :label="member.member_name"
+              :value="member.member_id">
+            </el-option>
+          </el-select>
+          <el-button @click="memberFormOpen" style="margin-left:-5px;border-bottom-left-radius: 0;border-top-left-radius: 0" class="padding-left-10 padding-right-10 "  icon="plus"></el-button>
+        </el-form-item>
+        <el-form-item label="收入金额" prop="account_sum" class="margin-bottom-10">
+          <el-input type='number' style="width: 194px" placeholder="请填写支出金额" v-model="incomeForm.account_sum">
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="success" @click.native="incomeSubmit" class="margin-left-10">提交收入</el-button>
+          <!--<el-button @click.native="addExpendFormVisible = false">取消</el-button>-->
+        </el-form-item>
+      </el-form>
 
     </div>
-
-    <div v-if="expendModel=='day'">
+    <div v-if="incomedModel=='day'" class="margin-top-20">
       <el-table
         :data="expendList"
         border
@@ -70,7 +108,7 @@
           label="收入成员">
         </el-table-column>
       </el-table>
-      <div class="text-right margin-top-5" v-show="currentPageParams.totalResult>0">
+      <div class="text-right margin-top-5" v-if="currentPageParams.totalResult>0">
         <label class="floatleft fs15 margin-top-5">共计收入：<span class="fs18" style="font-weight: bold">{{accountTotal}} 元</span></label>
         <el-pagination class="no-padding-right"
                        @current-change="handleCurrentChange"
@@ -81,7 +119,7 @@
         </el-pagination>
       </div>
     </div>
-    <div v-if="expendModel=='month'||expendModel=='year'" class="widget margin-top-10" >
+    <div v-if="incomedModel=='month'||incomedModel=='year'" class="widget margin-top-20" >
       <div class="widget-body" style="min-height: 360px">
         <div style="display: inline-block;width: 650px" ng-show="">
           <div id="chartLine" style="width:650px;height:360px"></div>
@@ -100,7 +138,7 @@
               label="收入金额（元）">
             </el-table-column>
           </el-table>
-          <div class="text-right margin-top-5" v-show="currentPageParams.totalResult>0">
+          <div class="text-right margin-top-5" v-if="currentPageParams.totalResult>0">
             <el-pagination class="no-padding-right"
                            @current-change="handleMonthChange"
                            :current-page.sync="currentPageParams.currentPage"
@@ -113,7 +151,7 @@
       </div>
     </div>
     <div class="widget margin-top-10 " v-show="accountTypeList&&accountTypeList.length>0">
-      <div class="widget-body" style="height: 360px">
+      <div class="widget-body" style="min-height: 360px">
         <div style="display: inline-block;width: 650px" ng-show="">
           <div id="myChart" style="width:600px;height:360px"></div>
         </div>
@@ -139,14 +177,14 @@
 
 
 
-    <el-dialog class="add-expend" title="新增收入" v-model="expendFormVisible" :close-on-click-modal="false" >
-      <el-form :model="expendForm" label-width="80px"  ref="editForm" >
+    <!--<el-dialog class="add-expend" title="新增收入" v-model="incomeFormVisible" :close-on-click-modal="false" >
+      <el-form :model="incomeForm" label-width="80px"  ref="editForm" >
         <el-form-item label="收入时间" prop="name" >
-          <el-date-picker type="date" placeholder="选择日期"  v-model="expendForm.account_date"></el-date-picker>
+          <el-date-picker type="date" placeholder="选择日期"  v-model="incomeForm.account_date"></el-date-picker>
 
         </el-form-item>
         <el-form-item label="收入类型">
-          <el-select v-model="expendForm.type_id" filterable placeholder="选择类型查询">
+          <el-select v-model="incomeForm.type_id" filterable placeholder="选择类型查询">
             <el-option
               v-for="type in typeList"
               :key="type.type_id"
@@ -156,11 +194,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="收入金额">
-          <el-input type='number' style="width: 220px" placeholder="请填写收入金额" v-model="expendForm.account_sum">
+          <el-input type='number' style="width: 220px" placeholder="请填写收入金额" v-model="incomeForm.account_sum">
           </el-input>
         </el-form-item>
         <el-form-item label="收入成员">
-          <el-select v-model="expendForm.member_id" filterable placeholder="选择成员查询">
+          <el-select v-model="incomeForm.member_id" filterable placeholder="选择成员查询">
             <el-option
               v-for="member in memberList"
               :key="member.member_id"
@@ -171,8 +209,32 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="expendFormVisible = false">取消</el-button>
+        <el-button @click.native="incomeFormVisible = false">取消</el-button>
         <el-button type="primary" @click.native="expendSubmit" >提交</el-button>
+      </div>
+    </el-dialog>-->
+    <el-dialog class="add-type" title="新增类型" v-model="typeFormVisible" :close-on-click-modal="false"  >
+      <el-form :model="typeForm" :rules="typeRules" label-width="80px"  ref="typeForm" >
+        <el-form-item label="支出类型" prop="type_name">
+          <el-input style="width: 260px" placeholder="请填写支出类型" v-model="typeForm.type_name">
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="typeFormVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="typeSubmit" >提交</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog class="add-member" title="新增成员" v-model="memberFormVisible" :close-on-click-modal="false"  >
+      <el-form :model="memberForm" :rules="memberRules" label-width="80px"  ref="memberForm" >
+        <el-form-item label="支出成员" prop="member_name">
+          <el-input style="width: 260px" placeholder="请填写支出成员" v-model="memberForm.member_name">
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="memberFormVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="memberSubmit" >提交</el-button>
       </div>
     </el-dialog>
 
@@ -185,15 +247,18 @@
     data() {
       return {
         searchInfo:{
-          date_range:[this.$moment(new Date()).subtract(7,'days'), new Date()],
+          date_range:[this.$moment(new Date()).format('YYYY-MM'), new Date()],
           date_month:new Date(),
           date_year:new Date(),
           type_id:null,
           member_id:null,
           account_flow:1
         },
-        expendModel:'day',
-        expendFormVisible:false,
+        incomedModel:'day',
+        incomeFormVisible:false,
+        addIncomeFormVisible:false,
+        typeFormVisible:false,
+        memberFormVisible:false,
         addLoading: false,
         accountTotal:0,
         memberList:[],
@@ -201,11 +266,39 @@
         expendList:[],
         monthYearExpendList:[],
         accountTypeList:[],
-        expendForm:{
+        incomeForm:{
           account_date:null,
           type_id:null,
           account_sum:null,
           member_id:null,
+        },
+        incomeRules:{
+          account_date:[
+            {  required: true, message: '请选择日期', trigger: 'change' }
+          ],
+          type_id:[
+            { type:'number',required: true, message: '请选择收入类型', trigger: 'change' }
+          ],
+          account_sum:[
+            { required: true, message: '请输入收入金额', trigger: 'change' },
+          ]
+        },
+        typeForm:{
+          type_name:'',
+          type_flow:0
+        },
+        memberForm:{
+          member_name:''
+        },
+        typeRules: {
+          type_name: [
+            {required: true, message: '请填写类型名称', trigger: 'change'},
+          ]
+        },
+        memberRules: {
+          member_name: [
+            {required: true, message: '请填写成员名称', trigger: 'change'},
+          ]
         },
         currentPageParams:{
           currentPage:1,
@@ -243,36 +336,36 @@
           this.typeList=[]
         })
       },
-      getExpendList:function () {
+      getIncomeList:function () {
         var vm=this,dateRange=null,url='account/queryByMonthOrYear';
 
-        if(vm.expendModel=='day'){
+        if(vm.incomedModel=='day'){
           url='account/queryAll'
           dateRange=vm.searchInfo.date_range;
-        }else if(vm.expendModel=='month'){
+        }else if(vm.incomedModel=='month'){
           dateRange=vm.searchInfo.date_month;
           vm.searchInfo.dateType='month'
-        }else if(vm.expendModel=='year') {
+        }else if(vm.incomedModel=='year') {
           dateRange = vm.searchInfo.date_year;
           vm.searchInfo.dateType='year'
         }
 
         vm.searchInfo.search_range=null;
         if(dateRange&&dateRange.toString().length>0) {
-          if(vm.expendModel=='day'){
+          if(vm.incomedModel=='day'){
             if (dateRange[0] != null && dateRange[1] != null) {
               vm.searchInfo.search_range = {
                 date_begin: vm.$moment(dateRange[0]).format('YYYY-MM-DD'),
                 date_end: vm.$moment(dateRange[1]).add('day', 1).format('YYYY-MM-DD')
               }
             }
-          }else if(vm.expendModel=='month'){
+          }else if(vm.incomedModel=='month'){
             vm.currentPageParams='';
             vm.searchInfo.search_range = {
               date_begin: vm.$moment(dateRange).format('YYYY-MM'),
               date_end: vm.$moment(dateRange).add('month', 1).format('YYYY-MM')
             }
-          }else if(vm.expendModel=='year') {
+          }else if(vm.incomedModel=='year') {
             vm.currentPageParams='';
             vm.searchInfo.search_range = {
               date_begin: vm.$moment(dateRange).format('YYYY'),
@@ -291,7 +384,7 @@
         }).then(response => {
           var result=response.data;
           if(result.code==0){
-            if(vm.expendModel=='day'){
+            if(vm.incomedModel=='day'){
               if(result.accountList&&result.accountList.length>0){
                 result.accountList.forEach(function (expend) {
                   expend.account_date=vm.$moment(expend.account_date).format('YYYY-MM-DD')
@@ -304,10 +397,10 @@
             vm.accountTotal=result.total;
             vm.accountTypeList=result.accountTypeList;
             vm.setChartsPie(result.accountTypeList);
-            if(vm.expendModel!='day'){
+            if(vm.incomedModel!='day'){
               vm.setChartLine(result.accountList);
             }
-            if(vm.expendModel=='month'){
+            if(vm.incomedModel=='month'){
               if(result.accountList&&result.accountList.length>0){
                 vm.currentPageParams={
                   currentPage:1,
@@ -331,34 +424,106 @@
           vm.expendList=[]
         })
       },
-      expendFormOpen:function () {
-        this.expendFormVisible = true;
-        this.expendForm= {
+      incomeFormOpen:function () {
+        this.addIncomeFormVisible = true;
+        this.$refs['incomeForm'].resetFields();
+        this.incomeForm= {
           account_date: this.$moment().format('YYYY-MM-DD'),
           type_id: null,
           account_sum: null,
           member_id: null
         }
       },
-      expendSubmit:function () {
+      typeFormOpen:function () {
+        this.typeFormVisible = true;
+        this.$refs['typeForm'].resetFields();
+        this.typeForm.type_name=null;
+      },
+      memberFormOpen:function () {
+        this.memberFormVisible = true;
+        this.$refs['memberForm'].resetFields();
+        this.memberForm.member_name=null;
+      },
+      incomeSubmit:function () {
         var e=this;
-        var expendInfo=this.expendForm;
-        expendInfo.account_flow=1;
-        expendInfo.user_id=1;
-        expendInfo.account_date=e.$moment(expendInfo.account_date).format('YYYY-MM-DD')
-        e.$http({
-          method:'GET',
-          url:this.config.baseUrl+'account/addAccount',
-          params:expendInfo
-        }).then(function(data){
-          var result=data.data;
-          var response=result.code;
-          if(response==0){
-            e.expendFormVisible=false;
-            e.$message({message: '提交成功！！', type: 'success'});
-            e.getExpendList()
-          }else {
-            e.$message.error( '提交失败！！');
+        e.$refs['incomeForm'].validate((valid) => {
+          if (valid) {
+            var incomeInfo = this.incomeForm;
+            incomeInfo.account_flow = 1;
+            incomeInfo.user_id = 1;
+            incomeInfo.account_date = e.$moment(incomeInfo.account_date).format('YYYY-MM-DD')
+            e.$http({
+              method: 'GET',
+              url: this.config.baseUrl + 'account/addAccount',
+              params: incomeInfo
+            }).then(function (data) {
+              var result = data.data;
+              var response = result.code;
+              if (response == 0) {
+                e.$message({message: '提交成功！！', type: 'success'});
+                e.$refs['incomeForm'].resetFields();
+                e.incomeForm = {
+                  account_date: e.$moment().format('YYYY-MM-DD'),
+                  type_id: null,
+                  account_sum: null,
+                  member_id: null
+                }
+                e.getIncomeList()
+              } else {
+                e.$message.error('提交失败！！');
+              }
+            })
+          }
+        })
+      },
+      typeSubmit:function () {
+        var e=this;
+        e.$refs['typeForm'].validate((valid) => {
+          if (valid) {
+            var typeInfo = this.typeForm;
+            typeInfo.type_flow = 1;
+            e.$http({
+              method: 'GET',
+              url: this.config.baseUrl + 'type/addType',
+              params: typeInfo
+            }).then(function (data) {
+              var result = data.data;
+              var response = result.code;
+              if (response == 0) {
+                e.typeFormVisible = false;
+                e.$refs['typeForm'].resetFields();
+                e.$message({message: '提交成功！！', type: 'success'});
+
+                e.getTypeList()
+              } else {
+                e.$message.error('提交失败！！');
+              }
+            })
+          }
+        })
+      },
+      memberSubmit:function () {
+        var e=this;
+        e.$refs['memberForm'].validate((valid) => {
+          if (valid) {
+            var expendInfo = this.memberForm;
+            e.$http({
+              method: 'GET',
+              url: this.config.baseUrl + 'member/addMember',
+              params: expendInfo
+            }).then(function (data) {
+              var result = data.data;
+              var response = result.code;
+              if (response == 0) {
+                e.memberFormVisible = false;
+                e.$refs['memberForm'].resetFields();
+                e.$message({message: '提交成功！！', type: 'success'});
+
+                e.getMemberList()
+              } else {
+                e.$message.error('提交失败！！');
+              }
+            })
           }
         })
       },
@@ -414,14 +579,14 @@
           var vm=this;
         let chartLine = vm.$echarts.init(document.getElementById('chartLine'))
         var dataNames=[],optData=[],chartType='line';
-        if(vm.expendModel=='year'){
+        if(vm.incomedModel=='year'){
           chartType='bar';
         }
         lineData.forEach(function (expend) {
 
-          if(vm.expendModel=='year'){
+          if(vm.incomedModel=='year'){
             dataNames.push(expend.account_date);
-          }else  if(vm.expendModel=='month'){
+          }else  if(vm.incomedModel=='month'){
             dataNames.push(vm.$moment(expend.account_date).format('M-D'));
           }
           optData.push(expend.account_sum);
@@ -463,7 +628,7 @@
       },
       handleCurrentChange(val) {
         this.currentPageParams.currentPage=val;
-        this.getExpendList()
+        this.getIncomeList()
       },
       handleMonthChange(val){
         this.currentPageParams.currentPage=val;
@@ -473,11 +638,11 @@
     watch:{
       searchInfo: {
         handler: function (val, oldVal) {
-          this.getExpendList();
+          this.getIncomeList();
         },
         deep: true
       },
-      expendModel:function (val) {
+      incomedModel:function (val) {
         this.currentPageParams= {
           currentPage: 1,
           showCount: 10,
@@ -499,14 +664,14 @@
 
       this.getMemberList();
       this.getTypeList();
-      this.getExpendList();
+      this.getIncomeList();
 
 
     }
   }
 </script>
 <style>
-  .add-expend .el-dialog{
+  .add-expend .el-dialog,.add-type .el-dialog,.add-member .el-dialog{
     width: 420px;
   }
 </style>
