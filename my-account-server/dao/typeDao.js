@@ -28,7 +28,7 @@ module.exports = {
 
 			// 建立连接，向表中插入值
 			// 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
-			connection.query($sql.insert, [param.type_name, param.type_flow], function(err, result) {
+			connection.query($sql.insert, [param.type_name, param.type_flow,param.user_id], function(err, result) {
 				if(result) {
 					result = {
 						code: 0,
@@ -100,12 +100,17 @@ module.exports = {
 		});
 	},
 	queryAll: function (req, res, next) {
+        var type=JSON.parse(req.query.typeStr);
+        var pageParams=req.query.pageStr;
 		pool.getConnection(function(err, connection) {
-			connection.query($sql.queryAll, function(err, result) {
+			connection.query($sql.queryAll(type,pageParams)+";"+$sql.queryCount(type), function(err, result) {
                 var resultData=result;
+                pageParams=JSON.parse(pageParams);
+                pageParams.totalResult=result[1][0].count;
                 if(result!==undefined){
                     resultData={
-                        typeList:result,
+                        typeList:result[0],
+						page:pageParams,
                         code:0
                     };
                 }

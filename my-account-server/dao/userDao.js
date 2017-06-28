@@ -106,6 +106,30 @@ module.exports = {
 				connection.release();
 			});
 		});
-	}
+	},
+	login:function (req,res,next) {
+        var param = req.body;
+        if(param.user_name!=null&&param.user_password!=null)
+		{
+            pool.getConnection(function(err, connection) {
+                connection.query($sql.login,[param.user_name,param.user_password], function(err, result) {
+                    var resultData=result;
+                    if(result!==undefined){
+                        resultData= {
+                            isLogin:result[0].count>0?true:false,
+                            code: 0
+                        }
+                        if(result[0].count>0){
+                            req.session.user = param;
+						}
+                    }
+                    jsonWrite(res, resultData);
+                    connection.release();
+                });
+            });
+		}else {
+            jsonWrite(res, undefined);
+		}
+    }
 
 };

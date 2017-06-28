@@ -78,7 +78,6 @@ var account = {
         if(pageParams&&JSON.stringify(pageParams).length>0){
             sql+=' limit '+pageParams.showCount+' offset '+pageParams.showCount*(pageParams.currentPage-1)
         }
-        console.log(sql)
         return sql;
     },
     accountBalance:'select sum(account_sum) as sum from account where account_flow=?'

@@ -20,7 +20,24 @@ Vue.prototype.$moment = moment
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 
+// http请求拦截器
+axios.interceptors.request.use(config => {
+  return config
+}, error => {
 
+  return Promise.reject(error)
+})
+// http响应拦截器
+axios.interceptors.response.use(data => {// 响应成功关闭loading
+  if (data.data.code == 8) {
+    router.push('/login')
+  } else {
+    return data
+  }
+}, error => {
+
+  return Promise.reject(error)
+})
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

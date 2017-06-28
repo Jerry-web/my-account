@@ -49,7 +49,6 @@ module.exports = {
 		pool.getConnection(function(err, connection) {
 			var id = +req.query.account_id;
 			connection.query($sql.delete, id, function(err, result) {
-				console.log(result)
 				if(result.affectedRows > 0) {
 					result = {
 						code: 0,
@@ -104,7 +103,6 @@ module.exports = {
 		var pageParams=JSON.parse(req.query.pageStr);
 
 		pool.getConnection(function(err, connection) {
-			console.log($sql.queryAll(account,pageParams)+';'+$sql.queryCount(account)+';'+$sql.queryType(account));
 			connection.query($sql.queryAll(account,pageParams)+';'+$sql.queryCount(account)+';'+$sql.queryType(account), function(err, result) {
                 var resultData=result;
                 if(result!==undefined){
@@ -130,7 +128,6 @@ module.exports = {
 		}
 
         pool.getConnection(function(err, connection) {
-            console.log($sql.queryMonthOrYear(account,pageParams)+';'+$sql.queryType(account));
             connection.query($sql.queryMonthOrYear(account,pageParams)+';'+$sql.queryCount(account)+';'+$sql.queryType(account), function(err, result) {
                 var resultData=result;
                 if(result!==undefined){
@@ -151,7 +148,6 @@ module.exports = {
         pool.getConnection(function(err, connection) {
             connection.query($sql.accountBalance+';'+$sql.accountBalance,[1,0], function(err, result) {
                 var resultData=result;
-                console.log(result);
                 if(result!==undefined){
                     resultData= {
                         accountBalance:result[0][0].sum-result[1][0].sum,

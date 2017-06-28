@@ -12,13 +12,8 @@ export default new Router({
         { path: 'income', component: resolve => require(['./components/income.vue'], resolve) },
         { path: 'expend', component: resolve => require(['./components/expend.vue'], resolve) },
         { path: 'account', component: resolve => require(['./components/account.vue'], resolve) }
-
       ]
-    }
+    },
+    { path: '/login', component: resolve => require(['./components/login.vue'], resolve)}
   ]
-
-
-
-
-
 })

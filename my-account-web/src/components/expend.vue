@@ -316,7 +316,15 @@
     methods:{
       getMemberList:function () {
           this.$http.get(
-              this.config.baseUrl+'member/queryAll'
+              this.config.baseUrl+'member/queryAll',
+            {
+                params:{
+                    memberStr:{
+                        user_id:1
+                    },
+                    pageStr:''
+                }
+            }
           ).then(response => {
             var result=response.data;
             if(result.code==0){
@@ -489,6 +497,7 @@
           if (valid) {
             var typeInfo = this.typeForm;
             typeInfo.type_flow = 0;
+            typeInfo.user_id = 1;
             e.$http({
               method: 'GET',
               url: this.config.baseUrl + 'type/addType',
@@ -513,6 +522,7 @@
         e.$refs['memberForm'].validate((valid) => {
           if (valid) {
             var expendInfo = this.memberForm;
+            expendInfo.user_id=1;
             e.$http({
               method: 'GET',
               url: this.config.baseUrl + 'member/addMember',
@@ -672,7 +682,7 @@
           totalResult: 0
         }
         this.searchInfo= {
-          date_range: [this.$moment(new Date()).subtract(7,'days'), new Date()],
+          date_range: [this.$moment(new Date()).format('YYYY-MM'), new Date()],
           date_month: this.$moment().format('YYYY-MM'),
           date_year:  this.$moment().format('YYYY'),
           type_id: null,
