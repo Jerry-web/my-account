@@ -26,7 +26,8 @@ module.exports = {
 		pool.getConnection(function(err, connection) {
 			// 获取前台页面传过来的参数
 			var param = req.query || req.params;
-
+            var user=req.session.user;
+            param.user_id=user.user_id;
 			// 建立连接，向表中插入值
 
 			connection.query($sql.insert, [param.account_date, param.account_sum,param.type_id,param.user_id,param.account_remark,param.account_flow,param.member_id], function(err, result) {
@@ -100,6 +101,8 @@ module.exports = {
 	},
 	queryAll: function (req, res, next) {
 		var account=JSON.parse(req.query.accountStr);
+        var user=req.session.user;
+        account.user_id=user.user_id;
 		var pageParams=JSON.parse(req.query.pageStr);
 
 		pool.getConnection(function(err, connection) {
@@ -122,6 +125,8 @@ module.exports = {
 	},
 	queryByMonthOrYear:function (req, res, next) {
         var account=JSON.parse(req.query.accountStr);
+        var user=req.session.user;
+        account.user_id=user.user_id;
         var pageParams='';
         if(req.query.pageStr){
             pageParams=JSON.parse(req.query.pageStr);
@@ -145,8 +150,9 @@ module.exports = {
         });
     },
 	getAccountBalance:function (req, res, next) {
+        var user=req.session.user;
         pool.getConnection(function(err, connection) {
-            connection.query($sql.accountBalance+';'+$sql.accountBalance,[1,0], function(err, result) {
+            connection.query($sql.accountBalance+';'+$sql.accountBalance,[1,user.user_id,0,user.user_id], function(err, result) {
                 var resultData=result;
                 if(result!==undefined){
                     resultData= {

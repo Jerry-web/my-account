@@ -20,8 +20,8 @@
       return {
         logining: false,
         loginForm: {
-          user_name: 'admin',
-          user_password: '123456'
+          user_name: null,
+          user_password: null
         },
         rules: {
           user_name: [
@@ -50,7 +50,8 @@
               if (response == 0) {
                 _this.logining = false;
                 if(result.isLogin){
-                  _this.$router.push('/index/home')
+                  _this.$router.push('/index/home');
+                  localStorage.setItem('user',JSON.stringify(result.user))
                   }else {
                   _this.$message.error('用户名或密码错误！！');
                 }

@@ -38,7 +38,7 @@ var accountType = {
         }
         return sql;
     },
-	queryByFlow: "select * from account_type where type_flow=?"
+	queryByFlow: "select * from account_type where type_flow=? and user_id=?"
 
 };
 

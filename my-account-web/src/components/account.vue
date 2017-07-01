@@ -104,9 +104,6 @@
           this.config.baseUrl+'member/queryAll',
           {
             params:{
-              memberStr:{
-                user_id:1
-              },
               pageStr:this.currentPageParams
             }
           }
@@ -124,9 +121,6 @@
           this.config.baseUrl+'type/queryAll',
           {
             params:{
-              typeStr:{
-                user_id:1
-              },
               pageStr:this.currentPageParams
             }
           }

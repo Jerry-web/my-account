@@ -107,6 +107,12 @@
           prop="member_name"
           label="收入成员">
         </el-table-column>
+        <el-table-column
+          label="操作" >
+          <template scope="scope">
+            <el-button type="danger" size="small" @click="deleteIncome(scope.row.account_id)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="text-right margin-top-5" v-if="currentPageParams.totalResult>0">
         <label class="floatleft fs15 margin-top-5">共计收入：<span class="fs18" style="font-weight: bold">{{accountTotal}} 元</span></label>
@@ -313,9 +319,6 @@
           this.config.baseUrl+'member/queryAll',
           {
             params:{
-              memberStr:{
-                user_id:1
-              },
               pageStr:''
             }
           }
@@ -432,6 +435,25 @@
           vm.expendList=[]
         })
       },
+      deleteIncome:function (accountId) {
+        this.$http.get(
+          this.config.baseUrl+'account/deleteAccount',{
+            params:{
+              account_id:accountId
+            }
+          }
+        ).then(response => {
+          var result=response.data;
+          if(result.code==0){
+            this.getIncomeList()
+            this.$message({message: '删除成功！！', type: 'success'});
+          }else {
+            this.$message.error('删除失败！！');
+          }
+        }, response => {
+          this.$message.error('删除失败！！');
+        })
+      },
       incomeFormOpen:function () {
         this.addIncomeFormVisible = true;
         this.$refs['incomeForm'].resetFields();
@@ -458,7 +480,6 @@
           if (valid) {
             var incomeInfo = this.incomeForm;
             incomeInfo.account_flow = 1;
-            incomeInfo.user_id = 1;
             incomeInfo.account_date = e.$moment(incomeInfo.account_date).format('YYYY-MM-DD')
             e.$http({
               method: 'GET',
@@ -490,7 +511,6 @@
           if (valid) {
             var typeInfo = this.typeForm;
             typeInfo.type_flow = 1;
-            typeInfo.user_id = 1;
             e.$http({
               method: 'GET',
               url: this.config.baseUrl + 'type/addType',
@@ -516,7 +536,6 @@
         e.$refs['memberForm'].validate((valid) => {
           if (valid) {
             var expendInfo = this.memberForm;
-            expendInfo.user_id=1;
             e.$http({
               method: 'GET',
               url: this.config.baseUrl + 'member/addMember',

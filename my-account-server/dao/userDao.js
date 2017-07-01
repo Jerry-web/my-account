@@ -117,10 +117,11 @@ module.exports = {
                     if(result!==undefined){
                         resultData= {
                             isLogin:result[0].count>0?true:false,
-                            code: 0
+                            code: 0,
+                            user:result[0]
                         }
                         if(result[0].count>0){
-                            req.session.user = param;
+                            req.session.user = result[0];
 						}
                     }
                     jsonWrite(res, resultData);
@@ -131,5 +132,6 @@ module.exports = {
             jsonWrite(res, undefined);
 		}
     }
+
 
 };

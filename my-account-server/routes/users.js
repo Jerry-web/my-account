@@ -32,5 +32,9 @@ router.post('/updateUser', function(req, res, next) {
 router.post('/login', function(req, res, next) {
     userDao.login(req, res, next);
 });
+router.get('/logout', function(req, res, next) {
+    req.session.user =null;
+    res.json({code:0})
+});
 
 module.exports = router;

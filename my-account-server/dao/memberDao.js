@@ -25,7 +25,8 @@ module.exports = {
 		pool.getConnection(function(err, connection) {
 			// 获取前台页面传过来的参数
 			var param = req.query || req.params;
-
+            var user=req.session.user;
+            param.user_id=user.user_id;
 			// 建立连接，向表中插入值
 			// 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
 			connection.query($sql.insert, [param.member_name,param.user_id], function(err, result) {
@@ -83,7 +84,6 @@ module.exports = {
 						result: result
 					});
 				}
-
 				connection.release();
 			});
 		});
@@ -100,7 +100,9 @@ module.exports = {
 		});
 	},
 	queryAll: function (req, res, next) {
-        var member=JSON.parse(req.query.memberStr);
+        var member=req.query.memberStr?JSON.parse(req.query.memberStr):{};
+        var user=req.session.user;
+        member.user_id=user.user_id;
         var pageParams=req.query.pageStr;
 		pool.getConnection(function(err, connection) {
 			connection.query($sql.queryAll(member,pageParams), function(err, result) {

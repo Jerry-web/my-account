@@ -21,6 +21,7 @@
                  <p class="fs16 margin-top-10" >本月支出</p>
                </div>
                <label class="main-block-money">￥{{expendTotal}}
+                 <span v-show="!expendTotal||expendTotal==0">0</span>
                  <span class="fs16">元</span>
                </label>
              </div>
@@ -33,6 +34,7 @@
                  <p class="fs16 margin-top-10" >本月收入</p>
                </div>
                <label class="main-block-money">￥{{incomeTotal}}
+                 <span v-show="!incomeTotal||incomeTotal==0">0</span>
                  <span class="fs16">元</span>
                </label>
              </div>
@@ -108,7 +110,9 @@
           var result=response.data;
           if(result.code==0){
             vm.expendList=result.accountList;
-            vm.setChartLine(result.accountList,flow)
+            if(result.accountList&&result.accountList.length>0) {
+              vm.setChartLine(result.accountList, flow)
+            }
             if(flow==0){
               vm.expendTotal=result.total;
             }else if(flow==1){
@@ -116,7 +120,9 @@
             }
 
             vm.accountTypeList=result.accountTypeList;
-            vm.setChartsPie(result.accountTypeList,flow);
+            if(result.accountTypeList&&result.accountTypeList.length>0){
+              vm.setChartsPie(result.accountTypeList,flow);
+            }
 
 
           }

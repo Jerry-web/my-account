@@ -319,9 +319,6 @@
               this.config.baseUrl+'member/queryAll',
             {
                 params:{
-                    memberStr:{
-                        user_id:1
-                    },
                     pageStr:''
                 }
             }
@@ -463,7 +460,6 @@
             if(valid) {
               var expendInfo = this.expendForm;
               expendInfo.account_flow = 0;
-              expendInfo.user_id = 1;
               expendInfo.account_date = e.$moment(expendInfo.account_date).format('YYYY-MM-DD')
               e.$http({
                 method: 'GET',
@@ -497,7 +493,6 @@
           if (valid) {
             var typeInfo = this.typeForm;
             typeInfo.type_flow = 0;
-            typeInfo.user_id = 1;
             e.$http({
               method: 'GET',
               url: this.config.baseUrl + 'type/addType',
@@ -522,7 +517,6 @@
         e.$refs['memberForm'].validate((valid) => {
           if (valid) {
             var expendInfo = this.memberForm;
-            expendInfo.user_id=1;
             e.$http({
               method: 'GET',
               url: this.config.baseUrl + 'member/addMember',

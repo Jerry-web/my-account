@@ -25,7 +25,8 @@ module.exports = {
 		pool.getConnection(function(err, connection) {
 			// 获取前台页面传过来的参数
 			var param = req.query || req.params;
-
+            var user=req.session.user;
+            param.user_id=user.user_id;
 			// 建立连接，向表中插入值
 			// 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
 			connection.query($sql.insert, [param.type_name, param.type_flow,param.user_id], function(err, result) {
@@ -100,7 +101,9 @@ module.exports = {
 		});
 	},
 	queryAll: function (req, res, next) {
-        var type=JSON.parse(req.query.typeStr);
+        var type=req.query.typeStr?JSON.parse(req.query.typeStr):{};
+        var user=req.session.user;
+        type.user_id=user.user_id;
         var pageParams=req.query.pageStr;
 		pool.getConnection(function(err, connection) {
 			connection.query($sql.queryAll(type,pageParams)+";"+$sql.queryCount(type), function(err, result) {
@@ -120,9 +123,10 @@ module.exports = {
 		});
 	},
     queryByFlow: function (req, res, next) {
-        var type_flow = +req.query.type_flow;
+        var type_flow = req.query.type_flow;
+        var user=req.session.user;
         pool.getConnection(function(err, connection) {
-            connection.query($sql.queryByFlow,type_flow, function(err, result) {
+            connection.query($sql.queryByFlow,[ type_flow,user.user_id ], function(err, result) {
                 var resultData=result;
                 if(result!==undefined){
                     resultData={
