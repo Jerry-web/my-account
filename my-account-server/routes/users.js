@@ -29,6 +29,12 @@ router.get('/deleteUser', function(req, res, next) {
 router.post('/updateUser', function(req, res, next) {
 	userDao.update(req, res, next);
 });
+router.post('/updatePass', function(req, res, next) {
+    userDao.updatePass(req, res, next);
+});
+router.post('/register', function(req, res, next) {
+    userDao.register(req, res, next);
+});
 router.post('/login', function(req, res, next) {
     userDao.login(req, res, next);
 });

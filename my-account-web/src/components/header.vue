@@ -24,7 +24,7 @@
     data() {
       return {
         loginUser:JSON.parse(localStorage.getItem('user')),
-        activeIndex: this.$route.path
+//        activeIndex: this.$route.path
 
       };
     },
@@ -42,8 +42,12 @@
         })
       }
     },
-    mounted(){
+    computed: {
+      activeIndex () {
+        return this.$store.state.activeIndex
+      }
     }
+
   }
 </script>
 <style>

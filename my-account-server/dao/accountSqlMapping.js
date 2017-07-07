@@ -6,7 +6,7 @@ var account = {
 	delete: 'delete from account where account_id=?',
 	queryById: 'select * from account where account_id=?',
 	queryAll: function (account,pageParams) {
-		var sql='select a.account_id,a.account_date,a.account_sum,t.type_name,m.member_name  from (account as a  left join account_type as t on a.type_id=t.type_id ) left join account_member as m on a.member_id=m.member_id';
+		var sql='select a.account_id,a.account_date,a.account_sum,t.type_name,m.member_name,a.account_remark from (account as a  left join account_type as t on a.type_id=t.type_id ) left join account_member as m on a.member_id=m.member_id';
         sql+=' where a.account_flow='+ account.account_flow+' and a.user_id='+account.user_id;
         if(account.type_id){
             sql+=' and a.type_id='+account.type_id

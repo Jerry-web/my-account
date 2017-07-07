@@ -87,8 +87,28 @@ module.exports = {
 				connection.release();
 			});
 		});
-
 	},
+    updatePass: function (req, res, next) {
+        // update by id
+        // 为了简单，要求同时传name和age两个参数
+        var param = req.body;
+        pool.getConnection(function(err, connection) {
+            connection.query($sql.updatePass, [param.user_password,param.user_id], function(err, result) {
+                if(result) {
+                    result = {
+                        code: 0,
+                        msg:'修改成功'
+                    };
+                }
+
+                // 以json形式，把操作结果返回给前台页面
+                jsonWrite(res, result);
+
+                // 释放连接
+                connection.release();
+            });
+        });
+    },
 	queryById: function (req, res, next) {
 		var user_id = +req.query.id; // 为了拼凑正确的sql语句，这里要转下整数
 		pool.getConnection(function(err, connection) {
@@ -131,7 +151,30 @@ module.exports = {
 		}else {
             jsonWrite(res, undefined);
 		}
-    }
+    },
+    register: function (req, res, next) {
+        pool.getConnection(function(err, connection) {
+            // 获取前台页面传过来的参数
+            var param = req.body ;
+
+            // 建立连接，向表中插入值
+            // 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
+            connection.query($sql.insert, [param.user_name, param.user_age,param.user_phone,param.user_email,param.user_password], function(err, result) {
+                if(result) {
+                    result = {
+                        code: 0,
+                        msg:'注册成功'
+                    };
+                }
+
+                // 以json形式，把操作结果返回给前台页面
+                jsonWrite(res, result);
+
+                // 释放连接
+                connection.release();
+            });
+        });
+    },
 
 
 };

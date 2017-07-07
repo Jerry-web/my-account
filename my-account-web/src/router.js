@@ -5,7 +5,7 @@ Vue.use(Router)
 
 export default new Router({
   routes:[
-    { path: '/', redirect: '/index/home' },
+    { path: '/', redirect: '/login' },
     { path: '/index', component: resolve => require(['./components/index.vue'], resolve),
       children:[
         { path: 'home', component: resolve => require(['./components/home.vue'], resolve) },
@@ -14,6 +14,7 @@ export default new Router({
         { path: 'account', component: resolve => require(['./components/account.vue'], resolve) }
       ]
     },
-    { path: '/login', component: resolve => require(['./components/login.vue'], resolve)}
+    { path: '/login', component: resolve => require(['./components/login.vue'], resolve)},
+    { path: '/register', component: resolve => require(['./components/register.vue'], resolve)}
   ]
 })

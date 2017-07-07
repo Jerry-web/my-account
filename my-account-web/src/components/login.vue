@@ -7,9 +7,9 @@
     <el-form-item prop="checkPass">
       <el-input type="password" v-model="loginForm.user_password" auto-complete="off" placeholder="密码"></el-input>
     </el-form-item>
-    <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
+    <el-checkbox v-model="checked" checked class="remember sky">记住密码</el-checkbox> | <router-link to="/register" class="sky margin-left-5">用户注册</router-link>
     <el-form-item style="width:100%;">
-      <el-button type="primary" style="width:100%;" @click.native.prevent="loginSubmit" :loading="logining">登录</el-button>
+      <el-button type="primary" native-type='submit' style="width:100%;" @click.native.prevent="loginSubmit" :loading="logining">登录</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -47,8 +47,8 @@
             }).then(function (data) {
               var result = data.data;
               var response = result.code;
+              _this.logining = false;
               if (response == 0) {
-                _this.logining = false;
                 if(result.isLogin){
                   _this.$router.push('/index/home');
                   localStorage.setItem('user',JSON.stringify(result.user))
@@ -65,6 +65,16 @@
           }
         });
       }
+    },
+    mounted(){
+        var loginUser=localStorage.getItem('user');
+        if(loginUser&&loginUser.length>0){
+            loginUser=JSON.parse(loginUser);
+            this. loginForm= {
+              user_name: loginUser.user_name,
+              user_password: loginUser.user_password
+            }
+        }
     }
   }
 
@@ -91,6 +101,6 @@
     color: #505458;
   }
   .remember {
-    margin: 0px 0px 35px 0px;
+    margin: 0px 5px 25px 0px;
   }
 </style>

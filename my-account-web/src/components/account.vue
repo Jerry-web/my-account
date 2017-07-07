@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div class="account">
     <div class="account-left" style="width: 180px;display: inline-block">
       <el-menu mode="accountIndex" default-active="3" class="fs15" @select="handleSelect">
         <el-menu-item-group title="系统管理">
@@ -15,6 +15,12 @@
     </div>
     <div class="account-right ">
       <div class=" margin-left-20">
+        <div v-show="accountIndex==2" style="width: 700px;" class="margin-top-40">
+          <div class="safe-block">
+            <label class="fs15">密码修改</label>
+            <el-button type="success" class="floatright" @click.native="passFormOpen" >修改密码</el-button>
+          </div>
+        </div>
         <div v-show="accountIndex==3" class="margin-top-20">
           <el-table
             :data="memberList"
@@ -43,7 +49,6 @@
             </el-pagination>
           </div>
         </div>
-
         <div v-show="accountIndex==4" class="margin-top-20">
           <el-table
             :data="typeList"
@@ -80,6 +85,20 @@
         </div>
       </div>
     </div>
+    <el-dialog class="edit-password" title="密码修改" v-model="passFormVisible" :close-on-click-modal="false"  >
+      <el-form :model="passForm" :rules="passRules" label-width="100px"  ref="passForm" >
+        <el-form-item prop="user_password" label="新密码">
+          <el-input type="password" v-model="passForm.user_password" auto-complete="off" placeholder="新密码"></el-input>
+        </el-form-item>
+        <el-form-item prop="check_password" label="确认新密码">
+          <el-input type="password" v-model="passForm.check_password" auto-complete="off" placeholder="确认新密码"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="passFormVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="passSubmit" >提交</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -87,6 +106,25 @@
 
   export default {
     data() {
+      var validatePass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入密码'));
+        } else {
+          if (this.passForm.check_password !== '') {
+            this.$refs['passForm'].validateField('check_password');
+          }
+          callback();
+        }
+      };
+      var validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== this.passForm.user_password) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
       return {
         accountIndex:3,
         currentPageParams: {
@@ -94,11 +132,38 @@
           showCount: 10,
           totalResult: 0
         },
+        loginUser:JSON.parse(localStorage.getItem('user')),
         memberList:[],
         typeList:[],
+        passForm:{
+          user_password:'',
+          check_password:''
+        },
+        passRules: {
+          user_password: [
+            { required: true, validator: validatePass, trigger: 'blur,,change' }
+          ],
+          check_password: [
+            {required: true, validator: validatePass2, trigger: 'blur,change' }
+          ],
+        },
+        passFormVisible:false,
+        passFormNum:0
       };
     },
     methods:{
+      passFormOpen:function () {
+          var _this=this;
+        _this.passFormVisible = true;
+        _this.passFormNum++;
+        if( _this.passFormNum>1){
+          _this.$refs['passForm'].resetFields();
+        }
+        _this.passForm= {
+          user_password: '',
+          check_password: ''
+        }
+      },
       getMemberList:function () {
         this.$http.get(
           this.config.baseUrl+'member/queryAll',
@@ -203,6 +268,31 @@
           this.getTypeList();
 
         }
+      },
+      passSubmit(ev) {
+        var _this = this;
+        _this.$refs['passForm'].validate((valid) => {
+          if (valid) {
+            _this.passForm.user_id=_this.loginUser.user_id;
+            _this.$http({
+              method: 'POST',
+              url: _this.config.baseUrl + 'user/updatePass',
+              data: _this.passForm
+            }).then(function (data) {
+              var result = data.data;
+              var response = result.code;
+              if (response == 0) {
+                _this.passFormVisible = false;
+                _this.$message({message: '修改成功！！', type: 'success'});
+              } else {
+                _this.$message.error('修改失败！！');
+              }
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
       }
     },
     mounted(){
@@ -237,7 +327,17 @@
     height: 50px;
     line-height: 50px;
   }
+  .safe-block{
+    width: 800px;
+    border: 1px solid #d3d3d3;
+    padding: 15px;
+  }
+  .safe-block .el-button{
+    margin-top: -5px;
+  }
+  .account .el-dialog{
+    width: 450px;
 
-
+  }
 </style>
 

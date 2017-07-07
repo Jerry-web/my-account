@@ -7,6 +7,8 @@ import config from './config'
 import echarts from 'echarts'
 import axios from 'axios'
 import moment from 'moment';
+import Vuex from 'vuex'
+import store from './vuex/store'
 import './assets/css/bootstrap.min.css'
 import './assets/css/font-awesome.min.css'
 import './assets/css/reset.css'
@@ -19,6 +21,7 @@ Vue.prototype.$echarts = echarts
 Vue.prototype.$moment = moment
 Vue.config.productionTip = false
 Vue.use(ElementUI)
+Vue.use(Vuex)
 
 // http请求拦截器
 axios.interceptors.request.use(config => {
@@ -41,6 +44,7 @@ axios.interceptors.response.use(data => {// 响应成功关闭loading
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  store,
   router,
   template: '<App/>',
   components: { App }

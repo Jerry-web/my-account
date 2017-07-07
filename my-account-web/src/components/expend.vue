@@ -81,6 +81,10 @@
           <el-input type='number' style="width: 194px" placeholder="请填写支出金额" v-model="expendForm.account_sum">
           </el-input>
         </el-form-item>
+        <el-form-item label="备注" prop="account_remark"  class="margin-bottom-10">
+          <el-input type='text' style="width: 350px" placeholder="请填写备注" v-model="expendForm.account_remark">
+          </el-input>
+        </el-form-item>
         <el-form-item>
           <el-button class="margin-left-10" type="success" @click.native="expendSubmit" >提交支出</el-button>
           <!--<el-button @click.native="addExpendFormVisible = false">取消</el-button>-->
@@ -109,6 +113,10 @@
         <el-table-column
           prop="member_name"
           label="支出成员">
+        </el-table-column>
+        <el-table-column
+          prop="account_remark"
+          label="备注">
         </el-table-column>
         <el-table-column
           label="操作" >
@@ -292,7 +300,7 @@
         },
         expendRules: {
           account_date: [
-            {required: true, message: '请选择日期', trigger: 'change'}
+            {type:'date',required: true, message: '请选择日期', trigger: 'change'}
           ],
           type_id: [
             {type: 'number', required: true, message: '请选择支出类型', trigger: 'change'}
@@ -310,7 +318,10 @@
           member_name: [
             {required: true, message: '请填写成员名称', trigger: 'change'},
           ]
-        }
+        },
+        expendOpenNum:0,
+        typeOpenNum:0,
+        memberOpenNum:0,
       };
     },
     methods:{
@@ -441,21 +452,31 @@
           account_date: this.$moment().format('YYYY-MM-DD'),
           type_id: null,
           account_sum: null,
-          member_id: null
+          member_id: null,
+          account_remark:''
         }
       },
       typeFormOpen:function () {
         this.typeFormVisible = true;
-        this.$refs['typeForm'].resetFields();
+        this.typeOpenNum++;
+        if(this.typeOpenNum>1){
+          this.$refs['typeForm'].resetFields();
+        }
         this.typeForm.type_name=null;
       },
       memberFormOpen:function () {
         this.memberFormVisible = true;
-        this.$refs['memberForm'].resetFields();
+        this.memberOpenNum++;
+        if(this.memberOpenNum>1){
+          this.$refs['memberForm'].resetFields();
+        }
         this.memberForm.member_name=null;
       },
       expendSubmit:function () {
         var e=this;
+        if(e.expendForm.account_date){
+          e.expendForm.account_date=new Date( e.expendForm.account_date);
+        }
         e.$refs['expendForm'].validate((valid) => {
             if(valid) {
               var expendInfo = this.expendForm;
@@ -536,23 +557,37 @@
         })
       },
       deleteExpend:function (accountId) {
-        this.$http.get(
-          this.config.baseUrl+'account/deleteAccount',{
-            params:{
-              account_id:accountId
+        var _this=this;
+        _this.$confirm('确定要删除此支出吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          _this.$http.get(
+            _this.config.baseUrl+'account/deleteAccount',{
+              params:{
+                account_id:accountId
+              }
             }
-          }
-        ).then(response => {
-          var result=response.data;
-          if(result.code==0){
-            this.getExpendList()
-            this.$message({message: '删除成功！！', type: 'success'});
-          }else {
-            this.$message.error('删除失败！！');
-          }
-        }, response => {
-          this.$message.error('删除失败！！');
-        })
+          ).then(response => {
+            var result=response.data;
+            if(result.code==0){
+              _this.getExpendList()
+              _this.$message({message: '删除成功！！', type: 'success'});
+            }else {
+              _this.$message.error('删除失败！！');
+            }
+          }, response => {
+            _this.$message.error('删除失败！！');
+          })
+        }).catch(() => {
+          _this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+
+
       },
       setChartsPie:function (optionData) {
         if(optionData&&optionData.length>0) {
@@ -684,11 +719,12 @@
           account_flow:0
         }
 
-      }
+      },
+
 
     },
     mounted(){
-
+      this.$store.state.activeIndex=this.$route.path;
       this.getMemberList();
       this.getTypeList();
       this.getExpendList();

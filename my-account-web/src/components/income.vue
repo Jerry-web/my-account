@@ -79,6 +79,10 @@
           <el-input type='number' style="width: 194px" placeholder="请填写支出金额" v-model="incomeForm.account_sum">
           </el-input>
         </el-form-item>
+        <el-form-item label="备注" prop="account_remark"  class="margin-bottom-10">
+          <el-input type='text' style="width: 350px" placeholder="请填写备注" v-model="incomeForm.account_remark">
+          </el-input>
+        </el-form-item>
         <el-form-item>
           <el-button type="success" @click.native="incomeSubmit" class="margin-left-10">提交收入</el-button>
           <!--<el-button @click.native="addExpendFormVisible = false">取消</el-button>-->
@@ -106,6 +110,10 @@
         <el-table-column
           prop="member_name"
           label="收入成员">
+        </el-table-column>
+        <el-table-column
+          prop="account_remark"
+          label="备注">
         </el-table-column>
         <el-table-column
           label="操作" >
@@ -277,10 +285,11 @@
           type_id:null,
           account_sum:null,
           member_id:null,
+          account_remark:''
         },
         incomeRules:{
           account_date:[
-            {  required: true, message: '请选择日期', trigger: 'change' }
+            { type:'date', required: true, message: '请选择日期', trigger: 'change' }
           ],
           type_id:[
             { type:'number',required: true, message: '请选择收入类型', trigger: 'change' }
@@ -310,7 +319,10 @@
           currentPage:1,
           showCount:10,
           totalResult:0
-        }
+        },
+        incomeOpenNum:0,
+        typeOpenNum:0,
+        memberOpenNum:0
       };
     },
     methods:{
@@ -436,27 +448,43 @@
         })
       },
       deleteIncome:function (accountId) {
-        this.$http.get(
-          this.config.baseUrl+'account/deleteAccount',{
-            params:{
-              account_id:accountId
+
+        var _this=this;
+        _this.$confirm('确定要删除此收入吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          _this.$http.get(
+            _this.config.baseUrl+'account/deleteAccount',{
+              params:{
+                account_id:accountId
+              }
             }
-          }
-        ).then(response => {
-          var result=response.data;
-          if(result.code==0){
-            this.getIncomeList()
-            this.$message({message: '删除成功！！', type: 'success'});
-          }else {
-            this.$message.error('删除失败！！');
-          }
-        }, response => {
-          this.$message.error('删除失败！！');
-        })
+          ).then(response => {
+            var result=response.data;
+            if(result.code==0){
+              _this.getIncomeList()
+              _this.$message({message: '删除成功！！', type: 'success'});
+            }else {
+              _this.$message.error('删除失败！！');
+            }
+          }, response => {
+            _this.$message.error('删除失败！！');
+          })
+        }).catch(() => {
+          _this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+
+
       },
       incomeFormOpen:function () {
         this.addIncomeFormVisible = true;
-        this.$refs['incomeForm'].resetFields();
+          this.$refs['incomeForm'].resetFields();
+
         this.incomeForm= {
           account_date: this.$moment().format('YYYY-MM-DD'),
           type_id: null,
@@ -466,16 +494,27 @@
       },
       typeFormOpen:function () {
         this.typeFormVisible = true;
-        this.$refs['typeForm'].resetFields();
+        this.typeOpenNum++;
+        if(this.typeOpenNum>1){
+          this.$refs['typeForm'].resetFields();
+        }
+
         this.typeForm.type_name=null;
       },
       memberFormOpen:function () {
         this.memberFormVisible = true;
-        this.$refs['memberForm'].resetFields();
+        this.memberOpenNum++;
+        if(this.memberOpenNum>1){
+          this.$refs['memberForm'].resetFields();
+        }
+
         this.memberForm.member_name=null;
       },
       incomeSubmit:function () {
         var e=this;
+        if(e.incomeForm.account_date) {
+          e.incomeForm.account_date = new Date(e.incomeForm.account_date);
+        }
         e.$refs['incomeForm'].validate((valid) => {
           if (valid) {
             var incomeInfo = this.incomeForm;
@@ -690,7 +729,7 @@
 
     },
     mounted(){
-
+      this.$store.state.activeIndex=this.$route.path;
       this.getMemberList();
       this.getTypeList();
       this.getIncomeList();

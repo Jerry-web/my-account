@@ -39,7 +39,7 @@ app.all('*', function(req, res, next) {
 
 app.use(function (req, res, next) {
     var url = req.originalUrl;
-    if (url != "/user/login" && !req.session.user) {
+    if (url != "/user/login" && !req.session.user&&url != "/user/register") {
         res.json({
             code:8
         });

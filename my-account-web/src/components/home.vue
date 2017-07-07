@@ -2,7 +2,7 @@
   <div class="home">
     <el-row>
            <el-col :span="8" style="padding-right: 6px" >
-             <div  class="main-block" style="background-color:#4CADE9;">
+             <div  class="main-block " style="background-color:#4CADE9;">
                <div class="main-block-info" >
                  <i class="fa fa-credit-card" ></i>
                  <p class="fs16 margin-top-10" >账户余额</p>
@@ -15,29 +15,34 @@
 
            </el-col>
            <el-col :span="8" style="padding-right: 3px" >
-             <div class="main-block " style="background-color: #F0BB4A;">
-               <div class="main-block-info" >
-                 <i class="fa fa-coffee" ></i>
-                 <p class="fs16 margin-top-10" >本月支出</p>
+             <router-link to="/index/expend">
+               <div class="main-block block-shadow" style="background-color: #F0BB4A;">
+                 <div class="main-block-info" >
+                   <i class="fa fa-coffee" ></i>
+                   <p class="fs16 margin-top-10" >本月支出</p>
+                 </div>
+                 <label class="main-block-money">￥{{expendTotal}}
+                   <span v-show="!expendTotal">0</span>
+                   <span class="fs16">元</span>
+                 </label>
                </div>
-               <label class="main-block-money">￥{{expendTotal}}
-                 <span v-show="!expendTotal||expendTotal==0">0</span>
-                 <span class="fs16">元</span>
-               </label>
-             </div>
+             </router-link>
+
 
            </el-col>
            <el-col :span="8" style="padding-left: 3px" >
-             <div class="main-block" style="background-color: #87B54D;">
+             <router-link to="/index/income">
+             <div class="main-block block-shadow" style="background-color: #87B54D;">
                <div class="main-block-info" >
                  <i class="fa fa-pagelines" ></i>
                  <p class="fs16 margin-top-10" >本月收入</p>
                </div>
                <label class="main-block-money">￥{{incomeTotal}}
-                 <span v-show="!incomeTotal||incomeTotal==0">0</span>
+                 <span v-show="!incomeTotal">0</span>
                  <span class="fs16">元</span>
                </label>
              </div>
+             </router-link>
            </el-col>
          </el-row>
        <div class="widget margin-top-20">
@@ -238,11 +243,10 @@
       }
     },
     mounted(){
-
+      this.$store.state.activeIndex=this.$route.path;
       this.getChartsData(0);
       this.getChartsData(1);
       this.getAccountBalance();
-
 
     }
   }
@@ -275,6 +279,9 @@
     top: 35px;
     font-size: 30px;
     color: white
+  }
+  .block-shadow:hover{
+    box-shadow: 0 0 3px 2px #d3d3d3;
   }
 
 </style>
