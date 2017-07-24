@@ -1,4 +1,7 @@
-# my-account  个人记账平台
+# my-account  个人记账平台 
+ 
+个人使用线上地址：http://www.jerrylee.site/#/login
+
 一、前端 my-account-web 
  1. vue2.0 + webpack + vue-cli + vue-router + vuex
  
