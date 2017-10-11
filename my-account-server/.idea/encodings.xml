@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/dao/accountDao.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dao/accountSqlMapping.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dao/memberDao.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dao/typeDao.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dao/typeSqlMapping.js" charset="UTF-8" />
+  </component>
+</project>
