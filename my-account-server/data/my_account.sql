@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50543
 File Encoding         : 65001
 
-Date: 2017-07-24 15:21:23
+Date: 2018-11-22 10:38:01
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -29,7 +29,7 @@ CREATE TABLE `account` (
   `user_id` int(11) DEFAULT NULL,
   `account_remark` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`account_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of account
@@ -67,7 +67,6 @@ INSERT INTO `account` VALUES ('73', '2017-06-18 00:00:00', '800', '1', '6', '2',
 INSERT INTO `account` VALUES ('82', '2017-06-17 00:00:00', '70', '1', '6', null, '1', null);
 INSERT INTO `account` VALUES ('83', '2017-06-17 00:00:00', '34', '1', '6', null, '1', null);
 INSERT INTO `account` VALUES ('85', '2017-06-29 00:00:00', '600', '0', '24', '18', '2', null);
-INSERT INTO `account` VALUES ('86', '2017-06-29 00:00:00', '100', '0', '25', '18', '2', null);
 INSERT INTO `account` VALUES ('87', '2017-06-29 00:00:00', '8000', '1', '26', '18', '2', null);
 INSERT INTO `account` VALUES ('88', '2017-06-29 00:00:00', '4000', '1', '8', '1', '1', null);
 INSERT INTO `account` VALUES ('91', '2017-07-03 00:00:00', '600', '0', '2', '1', '1', null);
@@ -83,6 +82,14 @@ INSERT INTO `account` VALUES ('105', '2017-07-11 00:00:00', '50', '0', '5', null
 INSERT INTO `account` VALUES ('106', '2017-07-05 00:00:00', '600', '0', '5', null, '1', '');
 INSERT INTO `account` VALUES ('107', '2017-07-05 00:00:00', '100', '0', '3', null, '1', '');
 INSERT INTO `account` VALUES ('108', '2017-07-12 00:00:00', '35', '1', '9', null, '1', null);
+INSERT INTO `account` VALUES ('109', '2017-10-11 00:00:00', '400', '0', '3', '1', '1', '');
+INSERT INTO `account` VALUES ('110', '2017-10-11 00:00:00', '500', '0', '5', '1', '1', null);
+INSERT INTO `account` VALUES ('111', '2017-10-11 00:00:00', '7000', '1', '8', '16', '1', null);
+INSERT INTO `account` VALUES ('112', '2017-10-11 00:00:00', '5000', '1', '8', '16', '1', null);
+INSERT INTO `account` VALUES ('113', '2018-07-03 00:00:00', '4000', '0', '4', '17', '1', 'test');
+INSERT INTO `account` VALUES ('114', '2018-07-03 00:00:00', '11290', '1', '8', '1', '1', null);
+INSERT INTO `account` VALUES ('115', '2018-07-01 00:00:00', '50', '0', '4', '1', '1', 'rrr');
+INSERT INTO `account` VALUES ('116', '2018-07-03 00:00:00', '400', '0', '2', '4', '1', '');
 
 -- ----------------------------
 -- Table structure for account_member
@@ -153,4 +160,31 @@ CREATE TABLE `account_user` (
 -- ----------------------------
 -- Records of account_user
 -- ----------------------------
-INSERT INTO `account_user` VALUES ('1', 'admin', '18', '13566782489', 'test@163.com', '123');
+INSERT INTO `account_user` VALUES ('1', 'admin', '18', '13566782489', 'test@163.com', '1234');
+INSERT INTO `account_user` VALUES ('2', 'test', '28', '15900322490', 'likaiming@163.com', '123');
+INSERT INTO `account_user` VALUES ('3', 'shenhe', null, null, null, '123');
+INSERT INTO `account_user` VALUES ('4', 'lijie', '', '13811268228', '', '123');
+INSERT INTO `account_user` VALUES ('5', 'zhangsan', '', '', '', '123');
+
+-- ----------------------------
+-- Table structure for subsidy
+-- ----------------------------
+DROP TABLE IF EXISTS `subsidy`;
+CREATE TABLE `subsidy` (
+  `subsidy_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `year` int(11) DEFAULT NULL,
+  `month` int(11) DEFAULT NULL,
+  `food_subsidy` double(11,0) DEFAULT '0',
+  `car_subsidy` double(11,0) DEFAULT '0',
+  `computer_subsidy` double(11,0) DEFAULT '0',
+  `festival_subsidy` double(11,0) DEFAULT '0',
+  `other_subsidy` double(11,0) DEFAULT NULL,
+  `reim_subsidy` double(11,0) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`subsidy_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of subsidy
+-- ----------------------------
