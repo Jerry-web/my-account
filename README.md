@@ -1,6 +1,5 @@
 # my-account  个人记账平台 
- 
-个人使用线上地址：http://47.94.235.178/#/login   用户名：test  密码：123 （可注册使用）
+
 
 一、前端 my-account-web 
  1. vue2.0 + webpack + vue-cli + vue-router + vuex
